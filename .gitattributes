@@ -1,0 +1,10 @@
+*.avif -delta
+*.bpg -delta
+*.flif -delta
+*.jp2 -delta
+*.jpg -delta
+*.jxr -delta
+*.ogv -delta
+*.png -delta
+*.webp -delta
+*.tar.gz -delta
