@@ -3,12 +3,8 @@
         "subset1": {
             "format": [
                 {
-                    "extension": "ivf",
-                    "name": "RAV1E"
-                },
-                {
-                    "extension": "webm",
-                    "name": "AOM"
+                    "extension": "avif",
+                    "name": "AVIF"
                 },
                 {
                     "extension": "bpg",
@@ -25,6 +21,10 @@
                 {
                     "extension": "webp",
                     "name": "WEBP"
+                },
+                {
+                    "extension": "webp",
+                    "name": "WEBP2"
                 },
                 {
                     "extension": "png",
@@ -230,7 +230,7 @@
                 },
                 {
                     "title": "Panthera tigris",
-                    "filename": "08-2011"
+                    "filename": "08-2011._Panthera_tigris_tigris_-_Texas_Park_-_Lanzarote_-TP04"
                 }
             ]
         }

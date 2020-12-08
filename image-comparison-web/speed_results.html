@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="generator" content="ReText 7.0.0">
+<link rel="stylesheet" media="screen" href="style.css" type="text/css" />
+<title>Speed results</title>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  config: ["MMLorHTML.js"],
+  jax: ["input/TeX", "output/HTML-CSS", "output/NativeMML"],
+  extensions: ["MathMenu.js", "MathZoom.js"],
+  TeX: {
+    equationNumbers: {autoNumber: "AMS"}
+  }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js"></script></head>
+<body>
+<h2>Lossless compression ratio and Weissman score:</h2>
+<table>
+<thead>
+<tr>
+<th align="left">codec</th>
+<th align="center">avg_bpp</th>
+<th align="center">avg_compression_ratio</th>
+<th align="center">avg_space_saving</th>
+<th align="center">wavg_encode_time</th>
+<th align="center">wavg_decode_time</th>
+<th align="center">weissman_score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">jxl</td>
+<td align="center">6.317</td>
+<td align="center">2.566</td>
+<td align="center">0.6102</td>
+<td align="center">20.764</td>
+<td align="center">3.8462</td>
+<td align="center">2.0517</td>
+</tr>
+<tr>
+<td align="left">webp</td>
+<td align="center">7.630</td>
+<td align="center">2.124</td>
+<td align="center">0.5292</td>
+<td align="center">57.190</td>
+<td align="center">2.9674</td>
+<td align="center">1.5415</td>
+</tr>
+<tr>
+<td align="left">webp2</td>
+<td align="center">7.339</td>
+<td align="center">2.208</td>
+<td align="center">0.5471</td>
+<td align="center">96.477</td>
+<td align="center">5.8577</td>
+<td align="center">1.5296</td>
+</tr>
+<tr>
+<td align="left">avif</td>
+<td align="center">8.968</td>
+<td align="center">1.807</td>
+<td align="center">0.4466</td>
+<td align="center">152.072</td>
+<td align="center">0.8917</td>
+<td align="center">1.2040</td>
+</tr>
+<tr>
+<td align="left">mozjpeg</td>
+<td align="center">14.224</td>
+<td align="center">1.139</td>
+<td align="center">0.1223</td>
+<td align="center">8.584</td>
+<td align="center">0.4867</td>
+<td align="center">1.0000</td>
+</tr>
+<tr>
+<td align="left">bpg</td>
+<td align="center">14.107</td>
+<td align="center">1.149</td>
+<td align="center">0.1295</td>
+<td align="center">18.193</td>
+<td align="center">4.3567</td>
+<td align="center">0.9311</td>
+</tr>
+</tbody>
+</table>
+<h2>Lossy compression and speed</h2>
+<p><img alt="Encoding time in function of bits per pixel" src="subset1.encoding_time.(avif,bpg,jxl,mozjpeg,webp,webp2).svg"></p>
+</body>
+</html>

@@ -4,20 +4,20 @@ For each comparison algorithms, we plot the quality in dB in function of the mea
 
 ##Bits per pixel at equivalent quality according to VMAF
 
-![Bits per pixel at equivalent quality according to VMAF](subset1.vmaf.(aom,bpg,jxl,mozjpeg,rav1e,webp).svg)
+![Bits per pixel at equivalent quality according to VMAF](subset1.vmaf.(avif,bpg,jxl,mozjpeg,webp,webp2).svg)
 
-##Bits per pixel at equivalent quality according to Y-PSNR-HVS-M
+##Bits per pixel at equivalent quality according to PSNR-HVS
 
-![Bits per pixel at equivalent quality according to Y-PSNR-HVS-M](subset1.psnr-hvs-m.(aom,bpg,jxl,mozjpeg,rav1e,webp).svg)
+![Bits per pixel at equivalent quality according to Y-PSNR-HVS-M](subset1.psnr-hvs.(avif,bpg,jxl,mozjpeg,webp,webp2).svg)
 
-##Bits per pixel at equivalent quality according to Y-MSSSIM
+##Bits per pixel at equivalent quality according to MSSSIM
 
-![Bits per pixel at equivalent quality according to Y-MSSSIM](subset1.ms-ssim.(aom,bpg,jxl,mozjpeg,rav1e,webp).svg)
+![Bits per pixel at equivalent quality according to MSSSIM](subset1.ms-ssim.(avif,bpg,jxl,mozjpeg,webp,webp2).svg)
 
-##Bits per pixel at equivalent quality according to Y-SSIM
+##Bits per pixel at equivalent quality according to SSIM
 
-![Bits per pixel at equivalent quality according to Y-SSIM](subset1.y-ssim.(aom,bpg,jxl,mozjpeg,rav1e,webp).svg)
+![Bits per pixel at equivalent quality according to SSIM](subset1.ssim.(avif,bpg,jxl,mozjpeg,webp,webp2).svg)
 
-##Bits per pixel at equivalent quality according to RGB-SSIM
+##Bits per pixel at equivalent quality according to CIEDE2000
 
-![Bits per pixel at equivalent quality according to RGB-SSIM](subset1.rgb-ssim.(aom,bpg,jxl,mozjpeg,rav1e,webp).svg)
+![Bits per pixel at equivalent quality according to CIEDE2000](subset1.ciede2000.(avif,bpg,jxl,mozjpeg,webp,webp2).svg)
