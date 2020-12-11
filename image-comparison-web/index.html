@@ -76,12 +76,13 @@
     <div class="caption">
         <h2>Statistics</h2>
         <p><a href="speed_results.html" target="_blank">Lossless compression ratio and encoding speed</a>.
-        <p><a href="lossy_results.html" target="_blank">Lossy compression metrics (VMAF, PSNR-HVS, CIEDE2000, SSIM, MS-SSIM)</a>.
+        <p><a href="lossy_results.html" target="_blank">Lossy compression metrics</a>.
         <p><a href="report.html" target="_blank">Full methodology</a>.
         <h2>Notes</h2>
         <p>Large images were first encoded with BPG at q24 filesizes. Medium is 60% of Large. Small is 60% of Medium. Tiny is
             60% of Small. Everything else was matched to +/- 5% filesize.</p>
-        <p>All images have been subsampled to full range Y'CbCr prior to compression.</p>
+        <p>All the pictures have been compressed from RGB PNGs except SVT-AV1. SVT-AV1 only support YUV420 input so the filesize reported are not comparable with other encoder supporting RGB input.</p>
+        <p>Both rav1e ard svt-av1 do not support lossless compression, the pictures presented here are only near lossless, so their filesize is not representative of actual lossless.</p>
         <p>Use Shift to swap images.</p>
         <p>This page is based on <a href="http://people.xiph.org/~xiphmont/demo/daala/update1-tool2b.shtml" target="_blank">Xiph.org's</a>            Daala comparison page. <a href="https://github.com/xooyoozoo/yolo-octo-bugfixes" target="_blank">Originally developed by xooyoozoo</a>.
             A list of sources for the images can be found in <a href="http://eclipseo.github.io/image-comparison-web/cite_images.txt"

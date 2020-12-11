@@ -1,21 +1,15 @@
 ##Lossless compression ratio and Weissman score:
 
-|   codec    |avg. compression ratio|avg. space saving|wavg. encode time|wavg. decode time|Weissman score|
-|:-----------|:-------------------:|:--------------:|:--------------:|:--------------:|:------------:|
-|daala       |                2.798|          64.26%|          0.8049|          0.7280|        3.3381|
-|vp9         |                2.905|          65.58%|          3.9375|          0.4193|        2.8011|
-|av1-20160930|                2.912|          65.66%|          4.7511|          0.4838|        2.7455|
-|av1-20170809|                2.984|          66.49%|         20.4157|          0.6900|        2.4003|
-|kdu         |                1.564|          36.06%|          0.3875|          0.2892|        2.0946|
-|jxr         |                1.560|          35.89%|          0.4058|          0.3628|        2.0730|
-|av1-20180222|                2.943|          66.02%|         97.6492|          1.0156|        2.0444|
-|flif        |                2.473|          59.57%|         22.1088|          4.3042|        1.9732|
-|openjpeg    |                1.564|          36.06%|          2.1181|          1.3794|        1.6300|
-|webp        |                2.124|          52.93%|         37.9675|          2.4799|        1.6079|
-|bpg         |                1.150|          13.03%|          3.7503|          3.5251|        1.1151|
-|mozjpeg     |                1.137|          12.05%|          8.7385|          0.4144|        1.0000|
+|format |avg_bpp|avg_compression_ratio|avg_space_saving|wavg_encode_time|wavg_decode_time|weissman_score|
+|:------|:-----:|:------------------:|:--------------:|:--------------:|:--------------:|:------------:|
+|jxl    | 10.093|               1.3007|         0.23120|          22.648|          3.3466|        1.2555|
+|webp   | 10.510|               1.2492|         0.19947|          42.614|          3.0936|        1.1343|
+|webp2  | 10.397|               1.2627|         0.20805|          68.266|          5.8399|        1.0980|
+|mozjpeg| 13.959|               0.9405|        -0.06330|           8.983|          0.5001|        1.0000|
+|bpg    | 13.722|               0.9567|        -0.04521|          17.480|          4.2157|        0.9480|
+|aom    | 11.530|               1.1386|         0.12175|         648.088|          4.9324|        0.8236|
 
 
 ##Lossy compression and speed
 
-![Encoding time in function of bits per pixel](subset1.encoding_time.(avif,bpg,jxl,mozjpeg,webp,webp2).svg)
+![Encoding time in function of bits per pixel](subset1.encoding_time.(aom,bpg,jxl,mozjpeg,rav1e,svt-av1,webp,webp2).svg)

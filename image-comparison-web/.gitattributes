@@ -7,4 +7,6 @@
 *.ogv -delta
 *.png -delta
 *.webp -delta
+*.webp2 -delta
+*.wp2 -delta
 *.tar.gz -delta
