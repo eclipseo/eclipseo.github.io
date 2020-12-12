@@ -4,7 +4,7 @@
             "format": [
                 {
                     "extension": "avif",
-                    "name": "AVIF"
+                    "name": "AOM AV1"
                 },
                 {
                     "extension": "bpg",
@@ -17,6 +17,14 @@
                 {
                     "extension": "jpg",
                     "name": "MOZJPEG"
+                },
+                {
+                    "extension": "avif",
+                    "name": "RAV1E"
+                },
+                {
+                    "extension": "avif",
+                    "name": "SVT-AV1"
                 },
                 {
                     "extension": "webp",
