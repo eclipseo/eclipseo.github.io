@@ -19,20 +19,26 @@ MathJax.Hub.Config({
 <body>
 <h1>Image formats comparison</h1>
 <h2>Introduction</h2>
-<p>This study compares 8 differents image formats, AVIF, BPG, JPEG XL, WebP2 and WebP. We use five algorithms in order to compare each format:</p>
+<p>This study compares 7 differents encoders, AOM AV1, BPG, JPEG XL, RAV1E, SVT-AV1, WebP and WebP2. We use five algorithms in order to compare each format:</p>
 <ul>
-<li>VMAF: Video Multi-Method Assessment Fusion: <a href="http://techblog.netflix.com/2016/06/toward-practical-perceptual-video.html">http://techblog.netflix.com/2016/06/toward-practical-perceptual-video.html</a></li>
+<li>SSimulacra: Structural SIMilarity Unveiling Local And Compression Related Artifacts. This is a perceptual metric designed specifically for scoring image compression related artifacts in a way that correlates well with human opinions.</li>
+<li>DSSIM: Image similarity comparison simulating human perception, based on multiscale SSIM.</li>
+<li>Butteraugli: project that estimates the psychovisual similarity of two images.</li>
 <li>SSIM: Structural Similarity algorithm</li>
 <li>MSSIM: Multi-Scale Structural Similarity algorithm</li>
 <li>PSNR-HVS: Peak Signal to Noise Ratio taking into account Contrast Sensitivity Function (CSF) and between-coefficient contrast masking of DCT basis functions</li>
 <li>CIEDE2000: a color-difference formula recommended by the CIE in year 2001</li>
+<li>VMAF: Video Multi-Method Assessment Fusion: <a href="http://techblog.netflix.com/2016/06/toward-practical-perceptual-video.html">http://techblog.netflix.com/2016/06/toward-practical-perceptual-video.html</a></li>
 </ul>
 <h2>Materials</h2>
 <h3>Image set</h3>
-<p>The image set is comprised of 50 images from <a href="https://wiki.xiph.org/Daala_Quickstart#Test_Media">the subset 1 and subset 2 maintened by Xiph</a>. All images are YCbCr 4:2:0 Y4M files.</p>
+<p>The image set is comprised of 49 images from <a href="https://wiki.xiph.org/Daala_Quickstart#Test_Media">the subset 1 maintained by Xiph</a>. All images are RGB PNG.</p>
 <h3>Codecs</h3>
 <ul>
-<li>Alliance for Open Media AVIF: <code>https://github.com/AOMediaCodec/libavif</code>. The version used is built from GIT revision <code>e09d63b7645e12c3d0f4db4c49b0848e9782a522</code> (december 2020).</li>
+<li>Alliance for Open Media AVIF: <code>https://github.com/AOMediaCodec/libavif</code>. The version used is 0.8.4.</li>
+<li>AOM AV1: <code>https://aomedia.googlesource.com/aom/</code> The version used is v2.0.0.</li>
+<li>AOM/Intel SVT-AV1: <code>https://github.com/AOMediaCodec/SVT-AV1</code> The version used is v0.8.6.</li>
+<li>Xiph RAV1E: <code>https://github.com/xiph/rav1e</code> The version used is v0.4.0-alpha.</li>
 <li>Fabrice Bellard BPG: <code>https://github.com/mirrorer/libbpg</code>. The version used is 0.9.7.</li>
 <li>Mozilla JPEG: <code>https://github.com/mozilla/mozjpeg</code>. The version used is 4.0.0.</li>
 <li>JPEG XL: <code>https://gitlab.com/wg1/jpeg-xl</code>. The version used is 0.1.1.</li>
@@ -42,6 +48,9 @@ MathJax.Hub.Config({
 <h3>Metrics</h3>
 <ul>
 <li>The VMAF (Video Multi-Method Assessment Fusion) metric, MSSIM, SSIM, CIEDE2000 and PNSR-HVS are computed using <code>vmaf</code>, provided by Netflix: <code>https://github.com/Netflix/vmaf</code>. The version used is 2.0.0. Each metric compares two Y4M files.</li>
+<li>SSImulacra: <code>https://github.com/cloudinary/ssimulacra</code> The version used is built from GIT revision <code>375726b13f9dec2a01950e6710e7e9f488c52ea3</code>.</li>
+<li>DSSIM: <code>https://github.com/kornelski/dssim</code> The version used is built from GIT revision <code>159d623a55fe8ba9b27e381e6b30657080617678</code>.</li>
+<li>BUtteraugli: <code>https://github.com/google/butteraugli</code> The version used is built from GIT revision <code>71b18b636b9c7d1ae0c1d3730b85b3c127eb4511</code>.</li>
 </ul>
 <h3>Tools</h3>
 <ul>
@@ -52,24 +61,22 @@ MathJax.Hub.Config({
 <li>Python 3 Matplot is used to plot graphs.</li>
 </ul>
 <h2>Methods</h2>
-<h3>Image conversion</h3>
-<p>Each Y4M image is exported to 4:2:0 PNG, YUV and PPM files with FFMPEG:</p>
-<p><code>ffmpeg -loglevel quiet -y -i [input] -pix_fmt yuv420p10le -strict -1 [output]</code></p>
 <h3>Image compression</h3>
 <p>All images are compressed losslessly and over a range of qualities for each codec:</p>
 <ul>
 <li>
-<p>BPG: </p>
+<p>AOM:</p>
 <ul>
-<li>lossless: <code>bpgenc -m 8 -f 420 -lossless -o [output] [input(PNG)]</code></li>
-<li>between q=1 and q=54: <code>bpgenc -m 8 -f 420 -q $quality -o [output] [input(PNG)]</code></li>
-</ul>
+<li>lossless: <code>avifenc --lossless --tilecolslog2 1 -c aom -s d -o [output] [input(PNG)]</code></li>
+<li>between q=4 and q=63: <code>avifenc --tilecolslog2 1 -c aom -s d --min $quality --max $quality -o [output] [input(PNG)]</code></li>
+<li></li>
+<li>
+<p>BPG: </p>
 </li>
 <li>
-<p>AVIF:</p>
-<ul>
-<li>lossless: <code>avifenc --lossless --tilecolslog2 1 -c aom -s 4 -o  [output] [input(Y4M)]</code></li>
-<li>between q=4 and q=63: <code>avifenc --tilecolslog2 1 -c aom -s 4 --min $quality --max $quality -o [output] [input(Y4M)]</code></li>
+<p>lossless: <code>bpgenc -m 8 -f 420 -lossless -o [output] [input(PNG)]</code></p>
+</li>
+<li>between q=1 and q=54: <code>bpgenc -m 8 -f 420 -q $quality -o [output] [input(PNG)]</code></li>
 </ul>
 </li>
 <li>
@@ -84,6 +91,20 @@ MathJax.Hub.Config({
 <ul>
 <li>lossless: <code>cjpeg -rgb -quality 100 [input(PNG)] &gt; [output]</code></li>
 <li>between q=5 and q=95: <code>cjpeg -quality $quality [input(PNG)] &gt; [output]</code></li>
+</ul>
+</li>
+<li>
+<p>RAV1E:</p>
+<ul>
+<li>lossless: <code>avifenc --lossless --tilecolslog2 1 -c rav1e -s d -o [output] [input(PNG)]</code></li>
+<li>between q=4 and q=63: <code>avifenc --tilecolslog2 1 -c rav1e -s d --min $quality --max $quality -o [output] [input(PNG)]</code></li>
+</ul>
+</li>
+<li>
+<p>AOM:</p>
+<ul>
+<li>lossless: <code>avifenc --lossless --tilecolslog2 1 -c aom -s d -y 420 -o [output] [input(PNG)]</code></li>
+<li>between q=4 and q=63: <code>avifenc --tilecolslog2 1 -c aom -s d -y 420 --min $quality --max $quality -o [output] [input(PNG)]</code></li>
 </ul>
 </li>
 <li>
@@ -121,8 +142,9 @@ The arithmetic mean of encoding and decoding speeds are calculated over the enti
 <p>where <code>r</code> is the compression ratio over PNG filesize, <code>T</code> the time required to compress, <code>̅r</code> and <code>̅T</code> the same metrics for the standard compressor, and alpha is a scaling constant.</p>
 <p>The standard compressor used is the compression of a JPG image using mozjpeg.</p>
 <h3>Lossy metrics</h3>
-<p>For each codec and image, we apply the following metrics, SSIM, CIEDE2000, MSSSIM, PSNR-HVS-M and VMAF, over image samples of increasing quality. For VMAF, we use the trained model <code>vmaf_v0.6.1</code> given by Netflix.</p>
-<p>For each sample, we first decode the compressed image, then export the resulting file to 4:2:0 Y4M using FFMPEG (<code>ffmpeg -loglevel quiet -y -i [input] -pix_fmt yuv420p10le -strict -1 [output]</code>). Finally we apply the metrics over each sample, comparing it to the original image.</p>
+<p>For each codec and image, we apply the following metrics, SSimulacra, DSSIM, Butteraugli, SSIM, CIEDE2000, MSSSIM, PSNR-HVS-M and VMAF, over image samples of increasing quality. For VMAF, we use the trained model <code>vmaf_v0.6.1</code> given by Netflix.</p>
+<p>For SSimulacra and DSSIM, Butteraugli, we first decode the compressed image to PNG then we apply the metrics over each sample, comparing it to the original image.</p>
+<p>For SSIM, CIEDE2000, MSSSIM, PSNR-HVS-M and VMAF, on each sample, we first decode the compressed image to PNG, then export the resulting file to 4:2:0 Y4M using FFMPEG (<code>ffmpeg -y -i  [input] -pix_fmt yuv444p -vf scale=in_range=full:out_range=full [output]</code>). Finally we apply the metrics over each sample, comparing it to the original image.</p>
 <p>For each codec, we calculate the arithmetic mean of each metric over the entire set of images, weighted by the area of the corresponding picture, for the samples of increasing quality:</p>
 <p>
 <script type="math/tex; mode=display">\overline{metric}_{quality\ q} = \frac{ \sum\limits_{picture=1}^{50} metric_{qp} \times area_{p}}{\sum\limits_{p=1}^{50} area_{p}}</script>
@@ -141,86 +163,94 @@ The arithmetic mean of encoding and decoding speeds are calculated over the enti
 <table>
 <thead>
 <tr>
-<th align="left">codec</th>
-<th align="center">avg. bits-per-pixels</th>
-<th align="center">avg. compression ratio</th>
-<th align="center">avg. space saving</th>
-<th align="center">wavg. encode time</th>
-<th align="center">wavg. decode time</th>
-<th align="center">Weissman score</th>
+<th align="left">format</th>
+<th align="center">avg_bpp</th>
+<th align="center">avg_compression_ratio</th>
+<th align="center">avg_space_saving</th>
+<th align="center">wavg_encode_time</th>
+<th align="center">wavg_decode_time</th>
+<th align="center">weissman_score</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td align="left">jxl</td>
-<td align="center">6.317</td>
-<td align="center">2.566</td>
-<td align="center">0.6102</td>
-<td align="center">20.764</td>
-<td align="center">3.8462</td>
-<td align="center">2.0517</td>
+<td align="center">10.093</td>
+<td align="center">1.3007</td>
+<td align="center">0.23120</td>
+<td align="center">22.648</td>
+<td align="center">3.3466</td>
+<td align="center">1.2555</td>
 </tr>
 <tr>
 <td align="left">webp</td>
-<td align="center">7.630</td>
-<td align="center">2.124</td>
-<td align="center">0.5292</td>
-<td align="center">57.190</td>
-<td align="center">2.9674</td>
-<td align="center">1.5415</td>
+<td align="center">10.510</td>
+<td align="center">1.2492</td>
+<td align="center">0.19947</td>
+<td align="center">42.614</td>
+<td align="center">3.0936</td>
+<td align="center">1.1343</td>
 </tr>
 <tr>
 <td align="left">webp2</td>
-<td align="center">7.339</td>
-<td align="center">2.208</td>
-<td align="center">0.5471</td>
-<td align="center">96.477</td>
-<td align="center">5.8577</td>
-<td align="center">1.5296</td>
-</tr>
-<tr>
-<td align="left">avif</td>
-<td align="center">8.968</td>
-<td align="center">1.807</td>
-<td align="center">0.4466</td>
-<td align="center">152.072</td>
-<td align="center">0.8917</td>
-<td align="center">1.2040</td>
+<td align="center">10.397</td>
+<td align="center">1.2627</td>
+<td align="center">0.20805</td>
+<td align="center">68.266</td>
+<td align="center">5.8399</td>
+<td align="center">1.0980</td>
 </tr>
 <tr>
 <td align="left">mozjpeg</td>
-<td align="center">14.224</td>
-<td align="center">1.139</td>
-<td align="center">0.1223</td>
-<td align="center">8.584</td>
-<td align="center">0.4867</td>
+<td align="center">13.959</td>
+<td align="center">0.9405</td>
+<td align="center">-0.06330</td>
+<td align="center">8.983</td>
+<td align="center">0.5001</td>
 <td align="center">1.0000</td>
 </tr>
 <tr>
 <td align="left">bpg</td>
-<td align="center">14.107</td>
-<td align="center">1.149</td>
-<td align="center">0.1295</td>
-<td align="center">18.193</td>
-<td align="center">4.3567</td>
-<td align="center">0.9311</td>
+<td align="center">13.722</td>
+<td align="center">0.9567</td>
+<td align="center">-0.04521</td>
+<td align="center">17.480</td>
+<td align="center">4.2157</td>
+<td align="center">0.9480</td>
+</tr>
+<tr>
+<td align="left">aom</td>
+<td align="center">11.530</td>
+<td align="center">1.1386</td>
+<td align="center">0.12175</td>
+<td align="center">648.088</td>
+<td align="center">4.9324</td>
+<td align="center">0.8236</td>
 </tr>
 </tbody>
 </table>
 <h3>Lossy compression and speed</h3>
 <p><img alt="Encoding time in function of bits per pixel" src="subset1.encoding_time.(avif,bpg,jxl,mozjpeg,webp,webp2).svg"></p>
 <h2>Lossy metrics</h2>
-<p>For each comparison algorithms, we plot the quality in dB in function of the mean bits per pixel on a logarithmic scale. We can then visualize which codec gives the best quality at a given bit per pixel (top left is better).</p>
+<p>For each comparison algorithms, we plot the quality in dB or score in function of the mean bits per pixel on a logarithmic scale. We can then visualize which codec gives the best quality at a given bit per pixel (top left is better).</p>
 <h3>Bits per pixel at equivalent quality according to VMAF</h3>
-<p><img alt="Bits per pixel at equivalent quality according to VMAF" src="subset1.vmaf.(avif,bpg,jxl,mozjpeg,webp,webp2).svg"></p>
+<h2>Bits per pixel at equivalent quality according to SSimulacra</h2>
+<p><img alt="Bits per pixel at equivalent quality according to Y-PSNR-HVS-M" src="subset1.ssimulacra.(aom,bpg,jxl,mozjpeg,rav1e,svt-av1,webp,webp2).svg"></p>
+<h2>Bits per pixel at equivalent quality according to DSSIM</h2>
+<p><img alt="Bits per pixel at equivalent quality according to Y-PSNR-HVS-M" src="subset1.dssim.(aom,bpg,jxl,mozjpeg,rav1e,svt-av1,webp,webp2).svg"></p>
+<h2>Bits per pixel at equivalent quality according to Butteraugli</h2>
+<p><img alt="Bits per pixel at equivalent quality according to Y-PSNR-HVS-M" src="subset1.butteraugli.(aom,bpg,jxl,mozjpeg,rav1e,svt-av1,webp,webp2).svg"></p>
 <h2>Bits per pixel at equivalent quality according to PSNR-HVS</h2>
-<p><img alt="Bits per pixel at equivalent quality according to Y-PSNR-HVS-M" src="subset1.psnr-hvs.(avif,bpg,jxl,mozjpeg,webp,webp2).svg"></p>
+<p><img alt="Bits per pixel at equivalent quality according to Y-PSNR-HVS-M" src="subset1.psnr-hvs.(aom,bpg,jxl,mozjpeg,rav1e,svt-av1,webp,webp2).svg"></p>
 <h2>Bits per pixel at equivalent quality according to MSSSIM</h2>
-<p><img alt="Bits per pixel at equivalent quality according to MSSSIM" src="subset1.ms-ssim.(avif,bpg,jxl,mozjpeg,webp,webp2).svg"></p>
+<p><img alt="Bits per pixel at equivalent quality according to MSSSIM" src="subset1.ssim.(aom,bpg,jxl,mozjpeg,rav1e,svt-av1,webp,webp2).svg"></p>
 <h2>Bits per pixel at equivalent quality according to SSIM</h2>
-<p><img alt="Bits per pixel at equivalent quality according to SSIM" src="subset1.ssim.(avif,bpg,jxl,mozjpeg,webp,webp2).svg"></p>
+<p><img alt="Bits per pixel at equivalent quality according to SSIM" src="(aom,bpg,jxl,mozjpeg,rav1e,svt-av1,webp,webp2).svg"></p>
 <h2>Bits per pixel at equivalent quality according to CIEDE2000</h2>
-<p><img alt="Bits per pixel at equivalent quality according to CIEDE2000" src="subset1.ciede2000.(avif,bpg,jxl,mozjpeg,webp,webp2).svg"></p>
+<p><img alt="Bits per pixel at equivalent quality according to CIEDE2000" src="subset1.ciede2000.(aom,bpg,jxl,mozjpeg,rav1e,svt-av1,webp,webp2).svg"></p>
+<h2>Bits per pixel at equivalent quality according to VMAF</h2>
+<p>Please note that VMAF is more suitable as a video codec comparison tool, not an image one.</p>
+<p><img alt="Bits per pixel at equivalent quality according to VMAF" src="subset1.vmaf.(aom,bpg,jxl,mozjpeg,rav1e,svt-av1,webp,webp2).svg"></p>
 
 </body>
 </html>

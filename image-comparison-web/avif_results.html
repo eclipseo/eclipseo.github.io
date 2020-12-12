@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="generator" content="ReText 7.1.0">
+<link rel="stylesheet" media="screen" href="style.css" type="text/css" />
+<title>Lossy results</title>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  config: ["MMLorHTML.js"],
+  jax: ["input/TeX", "output/HTML-CSS", "output/NativeMML"],
+  extensions: ["MathMenu.js", "MathZoom.js"],
+  TeX: {
+    equationNumbers: {autoNumber: "AMS"}
+  }
+});
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js"></script></head>
+<body>
+<h1>Comparison between AVIF encoders</h1>
+<p>Please note that SVT-AV1 only supports YUV420 colorspace.</p>
+<h2>Bits per pixel at equivalent quality according to SSimulacra</h2>
+<p><img alt="Bits per pixel at equivalent quality according to Y-PSNR-HVS-M" src="subset1.ssimulacra.(aom,rav1e,svt-av1).svg"></p>
+<h2>Bits per pixel at equivalent quality according to DSSIM</h2>
+<p><img alt="Bits per pixel at equivalent quality according to Y-PSNR-HVS-M" src="subset1.dssim.(aom,rav1e,svt-av1).svg"></p>
+<h2>Bits per pixel at equivalent quality according to Butteraugli</h2>
+<p><img alt="Bits per pixel at equivalent quality according to Y-PSNR-HVS-M" src="subset1.butteraugli.(aom,rav1e,svt-av1).svg"></p>
+<h2>Bits per pixel at equivalent quality according to PSNR-HVS</h2>
+<p><img alt="Bits per pixel at equivalent quality according to Y-PSNR-HVS-M" src="subset1.psnr-hvs.(aom,rav1e,svt-av1).svg"></p>
+<h2>Bits per pixel at equivalent quality according to MSSSIM</h2>
+<p><img alt="Bits per pixel at equivalent quality according to MSSSIM" src="subset1.ssim.(aom,rav1e,svt-av1).svg"></p>
+<h2>Bits per pixel at equivalent quality according to SSIM</h2>
+<p><img alt="Bits per pixel at equivalent quality according to SSIM" src="(aom,rav1e,svt-av1).svg"></p>
+<h2>Bits per pixel at equivalent quality according to CIEDE2000</h2>
+<p><img alt="Bits per pixel at equivalent quality according to CIEDE2000" src="subset1.ciede2000.(aom,rav1e,svt-av1).svg"></p>
+<h2>Bits per pixel at equivalent quality according to VMAF</h2>
+<p>Please note that VMAF is more suitable as a video codec comparison tool, not an image one.</p>
+<p><img alt="Bits per pixel at equivalent quality according to VMAF" src="subset1.vmaf.(aom,rav1e,svt-av1).svg"></p>
+
+</body>
+</html>

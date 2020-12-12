@@ -197,7 +197,6 @@ For each comparison algorithms, we plot the quality in dB or score in function o
 
 Please note that VMAF is more suitable as a video codec comparison tool, not an image one.
 
-![Bits per pixel at equivalent quality according to VMAF](subset1.vmaf.(avif,bpg,jxl,mozjpeg,webp,webp2).svg)
-
+![Bits per pixel at equivalent quality according to VMAF](subset1.vmaf.(aom,bpg,jxl,mozjpeg,rav1e,svt-av1,webp,webp2).svg)
 
 
