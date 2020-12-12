@@ -4,27 +4,27 @@ Please note that SVT-AV1 only supports YUV420 colorspace.
 
 ##Bits per pixel at equivalent quality according to SSimulacra
 
-![Bits per pixel at equivalent quality according to Y-PSNR-HVS-M](subset1.ssimulacra.(aom,rav1e,svt-av1).svg)
+![Bits per pixel at equivalent quality according to SSimulacra](subset1.ssimulacra.(aom,rav1e,svt-av1).svg)
 
 ##Bits per pixel at equivalent quality according to DSSIM
 
-![Bits per pixel at equivalent quality according to Y-PSNR-HVS-M](subset1.dssim.(aom,rav1e,svt-av1).svg)
+![Bits per pixel at equivalent quality according to DSSIM](subset1.dssim.(aom,rav1e,svt-av1).svg)
 
 ##Bits per pixel at equivalent quality according to Butteraugli
 
-![Bits per pixel at equivalent quality according to Y-PSNR-HVS-M](subset1.butteraugli.(aom,rav1e,svt-av1).svg)
+![Bits per pixel at equivalent quality according to Butteraugli](subset1.butteraugli.(aom,rav1e,svt-av1).svg)
 
 ##Bits per pixel at equivalent quality according to PSNR-HVS
 
-![Bits per pixel at equivalent quality according to Y-PSNR-HVS-M](subset1.psnr-hvs.(aom,rav1e,svt-av1).svg)
+![Bits per pixel at equivalent quality according to Y-PSNR-HVS](subset1.psnr-hvs.(aom,rav1e,svt-av1).svg)
 
 ##Bits per pixel at equivalent quality according to MSSSIM
 
-![Bits per pixel at equivalent quality according to MSSSIM](subset1.ssim.(aom,rav1e,svt-av1).svg)
+![Bits per pixel at equivalent quality according to MSSSIM](subset1.ms-ssim.(aom,rav1e,svt-av1).svg)
 
 ##Bits per pixel at equivalent quality according to SSIM
 
-![Bits per pixel at equivalent quality according to SSIM]((aom,rav1e,svt-av1).svg)
+![Bits per pixel at equivalent quality according to SSIM](subset1.ssim.(aom,rav1e,svt-av1).svg)
 
 ##Bits per pixel at equivalent quality according to CIEDE2000
 
