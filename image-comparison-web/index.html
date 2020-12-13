@@ -30,6 +30,7 @@
                     </select>
                     <select id="leftQual" style="font-size: 1.1em;">
                         <option value="ll">Lossless</option>
+                        <option value="l">Big</option>
                         <option value="l">Large</option>
                         <option value="m">Medium</option>
                         <option value="s" selected>Small</option>
@@ -44,6 +45,7 @@
                     </select>
                     <select id="rightQual" style="font-size: 1.1em;">
                         <option value="ll">Lossless</option>
+                        <option value="l">Big</option>
                         <option value="l">Large</option>
                         <option value="m">Medium</option>
                         <option value="s" selected>Small</option>
@@ -81,7 +83,7 @@
         <p><a href="webp_results.html" target="_blank">Comparison between WebP and WebP2</a>.
         <p><a href="report.html" target="_blank">Full methodology</a>.
         <h2>Notes</h2>
-        <p>Large images were first encoded with BPG at q24 filesizes. Medium is 60% of Large. Small is 60% of Medium. Tiny is
+        <p>Large images were first encoded with BPG at q24 filesizes. Big images are 180% of Large. Medium is 60% of Large. Small is 60% of Medium. Tiny is
             60% of Small. Everything else was matched to +/- 5% filesize.</p>
         <p>All the pictures have been compressed from RGB PNGs except SVT-AV1. SVT-AV1 only supports YUV420 input so the filesizes reported are not comparable with other encoders supporting RGB input.</p>
         <p>Both rav1e ard svt-av1 do not support lossless compression, the pictures presented here are only near lossless, so their filesizes is not representative of actual lossless.</p>
@@ -387,13 +389,12 @@
 
                 var canvas = canvases[side];
                 canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-                var area = canvas.width * canvas.height;
-                setText((xhr.response.byteLength / 1024).toFixed(1) + " KB", (xhr.response.byteLength * 8 / area).toFixed(2) + " bpp");
-
                 var image = new Image();
                 image.onload = function () {
                     canvas.width = image.width;
                     canvas.height = image.height;
+                    var area = canvas.width * canvas.height;
+                    setText((blob.size / 1024).toFixed(1) + " KB", (blob.size * 8 / area).toFixed(2) + " bpp");
                     canvas.getContext("2d").drawImage(image, 0, 0);
                     processCanvasScale(canvas, side);
                     window.URL.revokeObjectURL(blobPath);
@@ -407,79 +408,6 @@
                 image.src = blobPath;
             };
             xhr.send();
-
-            function j2kArrayToCanvas(encData, codec, canvas) {
-                workers.jp2.onmessage = function (event) {
-                    var bitmap = event.data.data;
-                    if (!bitmap) { return false; }
-
-                    canvas.width = event.data.width;
-                    canvas.height = event.data.height;
-                    var ctx = canvas.getContext("2d");
-                    var output = ctx.createImageData(canvas.width, canvas.height);
-                    var outputData = output.data;
-
-                    var pixelsPerChannel = canvas.width * canvas.height;
-                    var i = 0,
-                        j = 0;
-                    while (i < outputData.length && j < pixelsPerChannel) {
-                        outputData[i] = bitmap[j]; // R
-                        outputData[i + 1] = bitmap[j + pixelsPerChannel]; // G
-                        outputData[i + 2] = bitmap[j + (2 * pixelsPerChannel)]; // B
-                        outputData[i + 3] = 255; // A
-                        i += 4;
-                        j += 1;
-                    };
-                    ctx.putImageData(output, 0, 0);
-                    processCanvasScale(canvas, side);
-                };
-                if (workers.jp2 !== undefined) {
-                    workers.jp2.postMessage({
-                        bytes: encData,
-                        extension: codec
-                    });
-                } else console.error("Cannot decode JPEG 2000.");
-            };
-            function jxrBmpToCanvas(jxrBmp, canvas) {
-                var bmpUrl = window.URL.createObjectURL(jxrBmp);
-                var img = new Image();
-                img.onload = function () {
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    canvas.getContext("2d").drawImage(img, 0, 0);
-                    processCanvasScale(canvas, side);
-                    window.URL.revokeObjectURL(bmpUrl);
-                };
-                img.src = bmpUrl;
-            };
-            function webpArrayToCanvas(encData, canvas) {
-                workers.webp.onmessage = function (event) {
-                    var bitmap = event.data.bitmap;
-                    var biWidth = event.data.width;
-                    var biHeight = event.data.height;
-                    if (!bitmap) { return false; }
-
-                    canvas.width = biWidth;
-                    canvas.height = biHeight;
-                    var ctx = canvas.getContext("2d");
-                    var output = ctx.createImageData(canvas.width, canvas.height);
-                    var outputData = output.data;
-
-                    for (var h = 0; h < biHeight; h++) {
-                        for (var w = 0; w < biWidth; w++) {
-                            outputData[0 + w * 4 + (biWidth * 4) * h] = bitmap[1 + w * 4 + (biWidth * 4) * h];
-                            outputData[1 + w * 4 + (biWidth * 4) * h] = bitmap[2 + w * 4 + (biWidth * 4) * h];
-                            outputData[2 + w * 4 + (biWidth * 4) * h] = bitmap[3 + w * 4 + (biWidth * 4) * h];
-                            outputData[3 + w * 4 + (biWidth * 4) * h] = bitmap[0 + w * 4 + (biWidth * 4) * h];
-                        };
-                    };
-                    ctx.putImageData(output, 0, 0);
-                    processCanvasScale(canvas, side);
-                };
-                if (workers.webp !== undefined) {
-                    workers.webp.postMessage(encData);
-                } else console.error("Cannot decode WebP.");
-            }
         }
 
         function setSide(side) {
