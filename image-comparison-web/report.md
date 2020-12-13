@@ -157,7 +157,7 @@ The following archives contain the raw data in csv format for subset1 and subset
 
 ###Lossy compression and speed
 
-![Encoding time in function of bits per pixel](subset1.encoding_time.(avif,bpg,jxl,mozjpeg,webp,webp2).svg)
+![Encoding time in function of bits per pixel](subset1.encoding_time.(avif,bpg,jxl,mozjpeg,rav1e,svt-av1,webp,webp2).svg)
 
 ##Lossy metrics
 
