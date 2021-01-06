@@ -1,7 +1,27 @@
+var workers = {
+    bpg: undefined,
+    jp2: undefined, jxr: undefined, webp: undefined
+};
+var nativeDec = {
+    webm: false, bpg: false, flif: false, ogv: false, jp2: false, jxr: false, webp: false, pik: false,
+    check: function (flag, decodedWidth, encodedUrl) {
+        var supports = this;
+        var img = new Image();
+        img.src = encodedUrl;
+        img.onload = img.onerror = function () {
+            supports[flag] = (img.width && img.width === decodedWidth);
+        }
+    }
+};
+
+nativeDec.check('jp2', 4, 'data:image/jp2;base64,AAAADGpQICANCocKAAAAFGZ0eXBqcDIgAAAAAGpwMiAAAAAtanAyaAAAABZpaGRyAAAABAAAAAQAAw8HAAAAAAAPY29scgEAAAAAABAAAABpanAyY/9P/1EALwAAAAAABAAAAAQAAAAAAAAAAAAAAAQAAAAEAAAAAAAAAAAAAw8BAQ8BAQ8BAf9SAAwAAAABAQAEBAAB/1wABECA/5AACgAAAAAAGAAB/5PP/BAQFABcr4CA/9k=');
+nativeDec.check('jxr', 1, 'data:image/vnd.ms-photo;base64,SUm8AQgAAAAFAAG8AQAQAAAASgAAAIC8BAABAAAAAQAAAIG8BAABAAAAAQAAAMC8BAABAAAAWgAAAMG8BAABAAAAHwAAAAAAAAAkw91vA07+S7GFPXd2jckNV01QSE9UTwAZAYBxAAAAABP/gAAEb/8AAQAAAQAAAA==');
+nativeDec.check('webp', 2, 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA');
+
 var select = {
     file: getElId('fileSel'), scale: getElId('scaleSel'),
     left: getElId('leftSel'), right: getElId('rightSel'),
-    subset: getElId('subsetSel'),
+    subset: getElId('subsetSel')
 };
 
 var view = {
@@ -12,8 +32,7 @@ var view = {
 var viewOptions = {
     file: '', scale: '',
     left: '', leftQ: '',
-    right: '', rightQ: '',
-    subset: ''
+    right: '', rightQ: ''
 };
 
 var offset = {
@@ -74,9 +93,11 @@ select.file.onchange = function () {
 select.scale.onchange = processCanvasScale;
 
 select.left.onchange = function () {
+    checkWorkers('left');
     setSide('left');
 };
 select.right.onchange = function () {
+    checkWorkers('right');
     setSide('right');
 };
 
@@ -112,6 +133,30 @@ function getSlugName(str) {
         .replace(/-+/g, '-'); // collapse dashes
 
     return str;
+}
+
+/* Create new worker if needed. Terminate worker if unneeded. */
+function checkWorkers(sel) {
+    var curSel = getSelValue(select[sel], 'value');
+    var img = {
+        l: getSelValue(select.left, 'value'),
+        r: getSelValue(select.right, 'value')
+    };
+
+    processWorker('jp2');
+    processWorker('jxr');
+    processWorker('webp');
+
+    function processWorker(codec) {
+        if (img.l != codec && img.r != codec) {
+            if (workers[codec] !== undefined) {
+                workers[codec].terminate();
+                workers[codec] = undefined;
+            }
+        } else if (!nativeDec[codec] && curSel == codec && workers[codec] === undefined) {
+            workers[codec] = new Worker('js/' + codec + 'Worker.js');
+        }
+    }
 }
 
 /* Uses Lanczos2 for rescaling. In-browser too blurry. Lanczos3 too slow. */
@@ -164,14 +209,7 @@ function setSize(inCanvas, side) {
     } else el.style.height = height + "px";
 
     el.style.width = width + "px";
-    var styleEl = getElId(side + "SideStyle");
-    if (styleEl == null) {
-        styleEl = document.createElement("style");
-        styleEl.id = side + "SideStyle";
-        styleEl.textContent = "#" + el.id + "{}";
-        document.head.appendChild(styleEl);
-    }
-    styleEl.sheet.cssRules[0].style.backgroundImage = 'url(\"' + src + '\")';
+    el.style.backgroundImage = 'url(\"' + src + '\")';
     el.style.backgroundColor = "";
     el.style.opacity = 1;
     if (el == view.right) {
@@ -189,8 +227,7 @@ function setSize(inCanvas, side) {
     setSplit();
     window.location.hash = (viewOptions.file).concat(viewOptions.scale,
         '&', viewOptions.left, '=', viewOptions.leftQ,
-        '&', viewOptions.right, '=', viewOptions.rightQ,
-        '&', viewOptions.subset);
+        '&', viewOptions.right, '=', viewOptions.rightQ);
 }
 
 function setSplit() {
@@ -240,32 +277,140 @@ function setImage(side, pathBase, codec, setText) {
 
     xhr.onload = function () {
 
+        var mimeCodec = (codec == 'jxr') ? 'vnd.ms-photo' : codec;
         var blob = new Blob([xhr.response], {
-            type: "image/" + codec
+            type: "image/" + mimeCodec
         });
         var blobPath = window.URL.createObjectURL(blob);
 
         var canvas = canvases[side];
         canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-        var image = new Image();
-        image.onload = function () {
-            canvas.width = image.width;
-            canvas.height = image.height;
-            var area = canvas.width * canvas.height;
-            setText((blob.size / 1024).toFixed(1) + " KB", (blob.size * 8 / area).toFixed(2) + " bpp");
-            canvas.getContext("2d").drawImage(image, 0, 0);
-            processCanvasScale(canvas, side);
-            window.URL.revokeObjectURL(blobPath);
-        };
-        image.onerror = function () {
-            var arrayData = new Uint8Array(xhr.response);
+        var area = canvas.width * canvas.height;
+        setText((xhr.response.byteLength / 1024).toFixed(1) + " KB", (xhr.response.byteLength / area).toFixed(2) + " bpp");
 
-            image.src = urlFolder.concat(pathBase, '/', urlFile, '.', 'png');
+        if (codec == 'bpg') {
+            var bpg = new BPGDecoder(canvas.getContext("2d"));
+            bpg.onload = function () {
+                canvas.width = bpg.imageData.width;
+                canvas.height = bpg.imageData.height;
+                canvas.getContext("2d").putImageData(bpg.imageData, 0, 0);
+                processCanvasScale(canvas, side);
+                window.URL.revokeObjectURL(blobPath);
+            };
+            bpg.load(blobPath);
+        } else {
+            var image = new Image();
+            image.onload = function () {
+                canvas.width = image.width;
+                canvas.height = image.height;
+                canvas.getContext("2d").drawImage(image, 0, 0);
+                processCanvasScale(canvas, side);
+                window.URL.revokeObjectURL(blobPath);
+            };
+            image.onerror = function () {
+                var arrayData = new Uint8Array(xhr.response);
 
-        };
-        image.src = blobPath;
+                if (codec == 'jp2' || codec == 'j2k') {
+                    /* JPEG 2000 decoding */
+                    j2kArrayToCanvas(arrayData, codec, canvas);
+                } else if (codec == 'jxr') {
+                    /* JPEG XR decoding */
+                    workers.jxr.onmessage = function (event) {
+                        var jxrBmp = new Blob([new DataView(event.data.buffer)], { type: "image/bmp" });
+                        jxrBmpToCanvas(jxrBmp, canvas);
+                    };
+                    if (workers.jxr !== undefined) { workers.jxr.postMessage(xhr.response); }
+                    else console.error("Cannot decode JPEG XR.");
+                } else if (codec == 'webp') {
+                    /* WebP decoding */
+                    webpArrayToCanvas(arrayData, canvas);
+                } else if (codec == 'flif') {
+                    image.src = urlFolder.concat(pathBase, '/', urlFile, '.', 'png');
+                } else if (codec == 'ogv') {
+                    image.src = urlFolder.concat(pathBase, '/', urlFile, '.', 'png');
+                } else if (codec == 'webm') {
+                    image.src = urlFolder.concat(pathBase, '/', urlFile, '.', 'png');
+                } else if (codec == 'pik') {
+                    image.src = urlFolder.concat(pathBase, '/', urlFile, '.', 'png');
+                } else { console.error("No support for " + url); }
+            };
+            image.src = blobPath;
+        }
     };
     xhr.send();
+
+    function j2kArrayToCanvas(encData, codec, canvas) {
+        workers.jp2.onmessage = function (event) {
+            var bitmap = event.data.data;
+            if (!bitmap) { return false; }
+
+            canvas.width = event.data.width;
+            canvas.height = event.data.height;
+            var ctx = canvas.getContext("2d");
+            var output = ctx.createImageData(canvas.width, canvas.height);
+            var outputData = output.data;
+
+            var pixelsPerChannel = canvas.width * canvas.height;
+            var i = 0,
+                j = 0;
+            while (i < outputData.length && j < pixelsPerChannel) {
+                outputData[i] = bitmap[j]; // R
+                outputData[i + 1] = bitmap[j + pixelsPerChannel]; // G
+                outputData[i + 2] = bitmap[j + (2 * pixelsPerChannel)]; // B
+                outputData[i + 3] = 255; // A
+                i += 4;
+                j += 1;
+            };
+            ctx.putImageData(output, 0, 0);
+            processCanvasScale(canvas, side);
+        };
+        if (workers.jp2 !== undefined) {
+            workers.jp2.postMessage({
+                bytes: encData,
+                extension: codec
+            });
+        } else console.error("Cannot decode JPEG 2000.");
+    };
+    function jxrBmpToCanvas(jxrBmp, canvas) {
+        var bmpUrl = window.URL.createObjectURL(jxrBmp);
+        var img = new Image();
+        img.onload = function () {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            canvas.getContext("2d").drawImage(img, 0, 0);
+            processCanvasScale(canvas, side);
+            window.URL.revokeObjectURL(bmpUrl);
+        };
+        img.src = bmpUrl;
+    };
+    function webpArrayToCanvas(encData, canvas) {
+        workers.webp.onmessage = function (event) {
+            var bitmap = event.data.bitmap;
+            var biWidth = event.data.width;
+            var biHeight = event.data.height;
+            if (!bitmap) { return false; }
+
+            canvas.width = biWidth;
+            canvas.height = biHeight;
+            var ctx = canvas.getContext("2d");
+            var output = ctx.createImageData(canvas.width, canvas.height);
+            var outputData = output.data;
+
+            for (var h = 0; h < biHeight; h++) {
+                for (var w = 0; w < biWidth; w++) {
+                    outputData[0 + w * 4 + (biWidth * 4) * h] = bitmap[1 + w * 4 + (biWidth * 4) * h];
+                    outputData[1 + w * 4 + (biWidth * 4) * h] = bitmap[2 + w * 4 + (biWidth * 4) * h];
+                    outputData[2 + w * 4 + (biWidth * 4) * h] = bitmap[3 + w * 4 + (biWidth * 4) * h];
+                    outputData[3 + w * 4 + (biWidth * 4) * h] = bitmap[0 + w * 4 + (biWidth * 4) * h];
+                };
+            };
+            ctx.putImageData(output, 0, 0);
+            processCanvasScale(canvas, side);
+        };
+        if (workers.webp !== undefined) {
+            workers.webp.postMessage(encData);
+        } else console.error("Cannot decode WebP.");
+    }
 }
 
 function setSide(side) {
@@ -273,7 +418,6 @@ function setSide(side) {
     var whichQual = (isRight) ? rightQual : leftQual;
     var image = getSelValue(select[side], 'value');
     var pathBase = getSelValue(select[side], 'folder');
-
 
     if (pathBase != 'Original') {
         whichQual.disabled = false;
@@ -283,9 +427,9 @@ function setSide(side) {
         var quality = '';
     }
 
-    viewOptions[side] = pathBase;
-    viewOptions[side + 'Q'] = getSelValue(whichQual, 'value');
     pathBase = quality + pathBase;
+    viewOptions[side] = image;
+    viewOptions[side + 'Q'] = getSelValue(whichQual, 'value');
 
     setImage(side.toLowerCase(), pathBase, image,
         function (kbytes, bpp) {
@@ -345,8 +489,51 @@ function switchMode(keyCode) {
     infoText.right.style.opacity = splitMode;
 }
 
+/* Process URL hash for direct links. */
+function getWindowsOptions() {
+    if (window.location.hash) {
+        var hashArr, ampArr, imgOpts, name, scale, leftOpts, rightOpts;
 
-window.addEventListener("load",  function (event) {
+        hashArr = (location.hash).split('#', 3);
+
+        ampArr = (hashArr.pop() + '&=' + '&=').split('&', 5);
+
+        imgOpts = ampArr[0].split('*', 2);
+        leftOpts = ampArr[1].split('=', 2);
+        rightOpts = ampArr[2].split('=', 2);
+
+        for (var opt, j = 0; opt = select.file.options[j]; j++) {
+            if (getSlugName(opt.text) == imgOpts[0]) {
+                select.file.selectedIndex = j;
+                var z, s, q;
+
+                if (imgOpts[1]) {
+                    var z = document.querySelector('#scaleSel [ratio="' + imgOpts[1] + '"]');
+                    if (z) { z.selected = true };
+                }
+                if (leftOpts) {
+                    s = document.querySelector('#leftSel [value="' + leftOpts[0] + '"]');
+                    if (s) { s.selected = true };
+                    q = document.querySelector('#leftQual [value="' + leftOpts[1] + '"]');
+                    if (q) { q.selected = true };
+                    checkWorkers('left');
+                }
+                if (rightOpts) {
+                    s = document.querySelector('#rightSel [value="' + rightOpts[0] + '"]');
+                    if (s) { s.selected = true };
+                    q = document.querySelector('#rightQual [value="' + rightOpts[1] + '"]');
+                    if (q) { q.selected = true };
+                    checkWorkers('right');
+                }
+                break;
+            }
+        };
+    };
+}
+
+getWindowsOptions();
+
+document.addEventListener("DOMContentLoaded", function () {
     fetch("comparisonfiles.json")
         .then(response => response.json())
         .then(function (json) {
@@ -354,41 +541,21 @@ window.addEventListener("load",  function (event) {
             var subsetSel = document.getElementById("subsetSel");
 
             var subsetChange = function (event) {
-                var hashArr, ampArr, imgOpts, name, scale, leftOpts, rightOpts, selectOpts;
-
-                hashArr = (location.hash).split('#', 3);
-
-                ampArr = (hashArr.pop()+'&='+'&=').split('&', 4);
-
-                imgOpts = ampArr[0].split('*', 2);
-                leftOpts = ampArr[1].split('=', 2);
-                rightOpts = ampArr[2].split('=', 2);
-
                 if (!event) {
-                    selectOpts = ampArr[3].split('=', 2);
+                    value = subsetSel.value;
                 } else {
-                    selectOpts = event.target.value;
+                    value = event.target.value;
                 }
-
-
                 // format
                 var leftSel = document.getElementById("leftSel");
                 var rightSel = document.getElementById("rightSel");
-                while (leftSel.firstChild) {
-                    leftSel.removeChild(leftSel.firstChild);
-                }
-                while (rightSel.firstChild) {
-                    rightSel.removeChild(rightSel.firstChild);
-                }
-                for (format of json["comparisonfiles"][selectOpts]["format"]) {
+                for (format of json["comparisonfiles"][value]["format"]) {
                     var optLeft = document.createElement("option");
                     var optRight = document.createElement("option");
-
                     optLeft.setAttribute("folder", format["name"]);
                     optLeft.text = format["name"];
                     optLeft.value = format["extension"];
                     leftSel.add(optLeft, null);
-
                     optRight.setAttribute("folder", format["name"]);
                     optRight.text = format["name"];
                     optRight.value = format["extension"];
@@ -396,56 +563,12 @@ window.addEventListener("load",  function (event) {
                 }
                 // files
                 var fileSel = document.getElementById("fileSel");
-                while (fileSel.firstChild) {
-                    fileSel.removeChild(fileSel.firstChild);
-                }
-                var filesList = json["comparisonfiles"][selectOpts]["files"]
-                filesList.sort(function(a,b) {
-                    if ( a.title < b.title )
-                        return -1;
-                    if ( a.title > b.title )
-                        return 1;
-                    return 0;
-                })
-                for (file of filesList) {
+                for (file of json["comparisonfiles"][value]["files"]) {
                     var opt = document.createElement("option");
                     opt.value = file["filename"];
                     opt.text = file["title"];
                     fileSel.add(opt, null);
                 }
-                urlFolder = "comparisonfiles/" + getSelValue(select.subset, 'value') + "/";
-
-                viewOptions.subset = selectOpts;
-                select.subset.value = selectOpts;
-
-                for (var opt, j = 0; opt = select.file.options[j]; j++) {
-                    if (getSlugName(opt.text) == imgOpts[0]) {
-                        select.file.selectedIndex = j;
-                        var z, s, q;
-
-                        if (imgOpts[1]) {
-                            var z = document.querySelector('#scaleSel [ratio="' + imgOpts[1] + '"]');
-                            if (z) {z.selected = true};
-                        }
-
-                        if (leftOpts) {
-                            s = document.querySelector('#leftSel [folder="' + leftOpts[0] + '"]');
-                            if (s) {s.selected = true};
-                            q = document.querySelector('#leftQual [folder="' + leftOpts[1] + '"]');
-                            if (q) {q.selected = true};
-                        }
-                        if (rightOpts) {
-                            s = document.querySelector('#rightSel [folder="' + rightOpts[0] + '"]');
-                            if (s) {s.selected = true};
-                            q = document.querySelector('#rightQual [folder="' + rightOpts[1] + '"]');
-                            if (q) {q.selected = true};
-                        }
-                        break;
-                    }
-                };
-
-
-                setFile();
             }
 
             subsetSel.onchange = subsetChange;
@@ -455,9 +578,10 @@ window.addEventListener("load",  function (event) {
                 opt.value = subset;
                 opt.text = subset;
                 subsetSel.add(opt, null);
-
             }
             subsetChange();
+            urlFolder = "comparisonfiles/" + getSelValue(select.subset, 'value') + "/";
+            setFile();
         });
 });
 window.addEventListener("keydown", function (event) {
