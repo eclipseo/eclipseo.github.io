@@ -45,15 +45,6 @@
           padding: 1em;
           padding-bottom: 0em;
       }
-      .demo table {
-          position: relative;
-          left: 50%;
-          -ms-transform: translate(-50%, 0);
-          -webkit-transform: translate(-50%, 0);
-          transform: translate(-50%, 0);
-          margin-left: 0;
-          margin-right: auto;
-      }
       .demo table .title {
           text-align: center;
       }
