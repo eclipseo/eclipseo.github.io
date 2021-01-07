@@ -180,8 +180,8 @@ function setSize(inCanvas, side) {
             height: height
         };
         if (first) {
-            split.x = splitTarget.x = width * .5;
-            split.y = splitTarget.y = height * .5;
+            split.x = splitTarget.x = Math.round(width * .5);
+            split.y = splitTarget.y = Math.round(height * .5);
             first = 0;
         }
     }
@@ -209,7 +209,7 @@ function setSplit() {
             if (Math.abs(split.y - splitTarget.y) < .5)
                 split.y = splitTarget.y;
 
-            view.left.style.width = split.x + "px";
+            view.left.style.width = Math.round(split.x) + "px";
             infoText.left.style.right = (offset.width - split.x) + "px";
             infoText.left.style.bottom = (offset.height - split.y) + "px";
             infoText.right.style.left = (split.x + 1) + "px";
@@ -309,8 +309,8 @@ function setFile() {
 function moveSplit(event) {
     if (splitMode && urlFile) {
         var offset = view.right.getBoundingClientRect();
-        splitTarget.x = event.clientX - offset.left;
-        splitTarget.y = event.clientY - offset.top;
+        splitTarget.x = Math.round(event.clientX - offset.left);
+        splitTarget.y = Math.round(event.clientY - offset.top);
         if (splitTarget.x < 0) splitTarget.x = 0;
         if (splitTarget.y < textHeight) splitTarget.y = textHeight;
         if (splitTarget.x >= offset.width) splitTarget.x = offset.width - 1;
@@ -336,7 +336,7 @@ function switchMode(keyCode) {
     } else if (!splitMode) {
         view.left.style.borderRight = "1px dotted white";
         view.left.style.opacity = 1;
-        view.left.style.width = split.x + "px";
+        view.left.style.width = Math.round(split.x) + "px";
         infoText.center.innerHTML = "--- vs ---";
         splitMode = 1;
     }
