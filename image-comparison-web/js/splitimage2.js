@@ -356,19 +356,19 @@ window.addEventListener("load",  function (event) {
             var subsetChange = function (event) {
                 var hashArr, ampArr, imgOpts, name, scale, leftOpts, rightOpts, selectOpts;
 
-                    hashArr = (location.hash).split('#', 3);
-                    ampArr = (hashArr.pop()+'&='+'&='+'&').split('&', 4);
+                hashArr = (location.hash).split('#', 3);
+                ampArr = (hashArr.pop()+'&='+'&='+'&').split('&', 4);
 
-                    imgOpts = ampArr[0].split('*', 2);
-                    leftOpts = ampArr[1].split('=', 2);
-                    rightOpts = ampArr[2].split('=', 2);
-                    selectOpts = ampArr[3].split('=', 2)
+                imgOpts = ampArr[0].split('*', 2);
+                leftOpts = ampArr[1].split('=', 2);
+                rightOpts = ampArr[2].split('=', 2);
+                selectOpts = ampArr[3].split('=', 2)
 
-                    if (!event) {
-                        selectOpts = (selectOpts == "") ? subsetSel.value : selectOpts ;
-                    } else {
-                        selectOpts = event.target.value;
-                    }
+                if (!event) {
+                    selectOpts = (selectOpts == "") ? subsetSel.value : selectOpts ;
+                } else {
+                    selectOpts = event.target.value;
+                }
 
                 // format
                 var leftSel = document.getElementById("leftSel");
@@ -427,16 +427,17 @@ window.addEventListener("load",  function (event) {
                             if (z) {z.selected = true};
                         }
 
+
                         if (leftOpts) {
                             s = document.querySelector('#leftSel [folder="' + leftOpts[0] + '"]');
                             if (s) {s.selected = true};
-                            q = document.querySelector('#leftQual [folder="' + leftOpts[1] + '"]');
+                            q = document.querySelector('#leftQual [value="' + leftOpts[1] + '"]');
                             if (q) {q.selected = true};
                         }
                         if (rightOpts) {
                             s = document.querySelector('#rightSel [folder="' + rightOpts[0] + '"]');
                             if (s) {s.selected = true};
-                            q = document.querySelector('#rightQual [folder="' + rightOpts[1] + '"]');
+                            q = document.querySelector('#rightQual [value="' + rightOpts[1] + '"]');
                             if (q) {q.selected = true};
                         }
                         break;
