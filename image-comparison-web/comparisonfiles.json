@@ -4,38 +4,47 @@
             "format": [
                 {
                     "extension": "avif",
-                    "name": "AOM"
+                    "folder": "AOM",
+                    "name": "AVIF (AOM)"
                 },
                 {
                     "extension": "bpg",
+                    "folder": "BPG",
                     "name": "BPG"
                 },
                 {
                     "extension": "jxl",
+                    "folder": "JXL",
                     "name": "JXL"
                 },
                 {
                     "extension": "jpg",
+                    "folder": "MOZJPEG",
                     "name": "MOZJPEG"
                 },
                 {
                     "extension": "avif",
-                    "name": "RAV1E"
+                    "folder": "RAV1E",
+                    "name": "AVIF (RAV1E)"
                 },
                 {
                     "extension": "avif",
-                    "name": "SVT-AV1"
+                    "folder": "SVT-AV1",
+                    "name": "AVIF (SVT-AV1)"
                 },
                 {
                     "extension": "webp",
+                    "folder": "WEBP",
                     "name": "WEBP"
                 },
                 {
                     "extension": "wp2",
+                    "folder": "WEBP2",
                     "name": "WEBP2"
                 },
                 {
                     "extension": "png",
+                    "folder": "Original",
                     "name": "Original"
                 }
             ],
