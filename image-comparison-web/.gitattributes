@@ -10,3 +10,4 @@
 *.webp2 -delta
 *.wp2 -delta
 *.tar.gz -delta
+*.heif -delta
