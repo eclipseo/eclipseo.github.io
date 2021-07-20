@@ -21,74 +21,101 @@ MathJax.Hub.Config({
 <table>
 <thead>
 <tr>
-<th align="left">format</th>
-<th align="center">avg_bpp</th>
-<th align="center">avg_compression_ratio</th>
-<th align="center">avg_space_saving</th>
-<th align="center">wavg_encode_time</th>
-<th align="center">wavg_decode_time</th>
-<th align="center">weissman_score</th>
+<th>format</th>
+<th align="right">avg_bpp</th>
+<th align="right">avg_compression_ratio</th>
+<th align="right">avg_space_saving</th>
+<th align="right">wavg_encode_time</th>
+<th align="right">wavg_decode_time</th>
+<th align="right">weissman_score</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">jxl</td>
-<td align="center">10.093</td>
-<td align="center">1.3007</td>
-<td align="center">0.23120</td>
-<td align="center">22.648</td>
-<td align="center">3.3466</td>
-<td align="center">1.2555</td>
+<td>heif_1.12.0</td>
+<td align="right">9.931</td>
+<td align="right">1.3219</td>
+<td align="right">0.24354</td>
+<td align="right">16.09</td>
+<td align="right">5.4341</td>
+<td align="right">1.3500</td>
 </tr>
 <tr>
-<td align="left">webp</td>
-<td align="center">10.510</td>
-<td align="center">1.2492</td>
-<td align="center">0.19947</td>
-<td align="center">42.614</td>
-<td align="center">3.0936</td>
-<td align="center">1.1343</td>
+<td>jxl_20210715</td>
+<td align="right">10.097</td>
+<td align="right">1.3002</td>
+<td align="right">0.23088</td>
+<td align="right">31.52</td>
+<td align="right">3.0728</td>
+<td align="right">1.2416</td>
 </tr>
 <tr>
-<td align="left">webp2</td>
-<td align="center">10.397</td>
-<td align="center">1.2627</td>
-<td align="center">0.20805</td>
-<td align="center">68.266</td>
-<td align="center">5.8399</td>
-<td align="center">1.0980</td>
+<td>webp2_20210715</td>
+<td align="right">10.266</td>
+<td align="right">1.2789</td>
+<td align="right">0.21807</td>
+<td align="right">27.98</td>
+<td align="right">6.3383</td>
+<td align="right">1.2354</td>
 </tr>
 <tr>
-<td align="left">mozjpeg</td>
-<td align="center">13.959</td>
-<td align="center">0.9405</td>
-<td align="center">-0.06330</td>
-<td align="center">8.983</td>
-<td align="center">0.5001</td>
-<td align="center">1.0000</td>
+<td>jxl_0.3.7</td>
+<td align="right">10.097</td>
+<td align="right">1.3002</td>
+<td align="right">0.23088</td>
+<td align="right">34.15</td>
+<td align="right">3.3576</td>
+<td align="right">1.2320</td>
 </tr>
 <tr>
-<td align="left">bpg</td>
-<td align="center">13.722</td>
-<td align="center">0.9567</td>
-<td align="center">-0.04521</td>
-<td align="center">17.480</td>
-<td align="center">4.2157</td>
-<td align="center">0.9480</td>
+<td>webp_1.2.0</td>
+<td align="right">10.508</td>
+<td align="right">1.2494</td>
+<td align="right">0.19963</td>
+<td align="right">82.57</td>
+<td align="right">4.2148</td>
+<td align="right">1.0916</td>
 </tr>
 <tr>
-<td align="left">aom</td>
-<td align="center">11.530</td>
-<td align="center">1.1386</td>
-<td align="center">0.12175</td>
-<td align="center">648.088</td>
-<td align="center">4.9324</td>
-<td align="center">0.8236</td>
+<td>webp2_20201204</td>
+<td align="right">10.397</td>
+<td align="right">1.2627</td>
+<td align="right">0.20805</td>
+<td align="right">93.47</td>
+<td align="right">6.5015</td>
+<td align="right">1.0912</td>
+</tr>
+<tr>
+<td>mozjpeg</td>
+<td align="right">13.959</td>
+<td align="right">0.9405</td>
+<td align="right">-0.06330</td>
+<td align="right">10.96</td>
+<td align="right">0.5793</td>
+<td align="right">1.0000</td>
+</tr>
+<tr>
+<td>aom_20210715</td>
+<td align="right">11.656</td>
+<td align="right">1.1263</td>
+<td align="right">0.11215</td>
+<td align="right">414.12</td>
+<td align="right">4.3691</td>
+<td align="right">0.8614</td>
+</tr>
+<tr>
+<td>aom_3.1.1</td>
+<td align="right">11.657</td>
+<td align="right">1.1262</td>
+<td align="right">0.11209</td>
+<td align="right">507.02</td>
+<td align="right">4.4280</td>
+<td align="right">0.8480</td>
 </tr>
 </tbody>
 </table>
 <h2>Lossy compression and speed</h2>
-<p><img class="graph" alt="Encoding time in function of bits per pixel" src="subset1.encoding_time.(aom,bpg,jxl,mozjpeg,rav1e,svt-av1,webp,webp2).svg"></p>
+<p><img class="graph" alt="Encoding time in function of bits per pixel" src="subset1.encoding_time.(aom_20210715,jxl_20210715,mozjpeg,webp2_20210715,webp_1.2.0).svg"></p>
 
 </body>
 </html>

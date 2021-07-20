@@ -4,35 +4,39 @@
             "format": [
                 {
                     "extension": "avif",
-                    "name": "AOM"
+                    "name": "AOM_3.1.1"
                 },
                 {
-                    "extension": "bpg",
-                    "name": "BPG"
+                    "extension": "avif",
+                    "name": "AOM_20210715"
+                },
+                {
+                    "extension": "heif",
+                    "name": "HEIF_1.12.0"
                 },
                 {
                     "extension": "jxl",
-                    "name": "JXL"
+                    "name": "JXL_0.3.7"
+                },
+                {
+                    "extension": "jxl",
+                    "name": "JXL_20210715"
                 },
                 {
                     "extension": "jpg",
                     "name": "MOZJPEG"
                 },
                 {
-                    "extension": "avif",
-                    "name": "RAV1E"
-                },
-                {
-                    "extension": "avif",
-                    "name": "SVT-AV1"
-                },
-                {
                     "extension": "webp",
-                    "name": "WEBP"
+                    "name": "WEBP_1.2.0"
                 },
                 {
                     "extension": "wp2",
-                    "name": "WEBP2"
+                    "name": "WEBP2_20201204"
+                },
+                {
+                    "extension": "wp2",
+                    "name": "WEBP2_20210715"
                 },
                 {
                     "extension": "png",
