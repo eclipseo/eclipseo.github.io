@@ -14,4 +14,4 @@
 
 ##Lossy compression and speed
 
-![Encoding time in function of bits per pixel](subset1.encoding_time.(aom_20210715,jxl_20210715,mozjpeg,webp2_20210715,webp_1.2.0).svg)
+![Encoding time in function of bits per pixel](subset1.encoding_time.(aom_20210715,jxl_20210715,heif_1.12.0,mozjpeg,webp_1.2.0,webp2_20210715).svg)
