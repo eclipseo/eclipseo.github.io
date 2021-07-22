@@ -30,6 +30,7 @@ var canvases = {
     leftDest: getElId('canvasLeft'),
     rightDest: getElId('canvasRight')
 }
+
 function prepCanvas(width, height, which) {
     var c;
 
