@@ -4,33 +4,11 @@ var select = {
     subset: getElId('subsetSel'),
 };
 
-var view = {
-    left: getElId('leftContainer'),
-    right: getElId('rightContainer')
-};
-
 var viewOptions = {
     file: '', scale: '',
     left: '', leftQ: '',
     right: '', rightQ: '',
     subset: ''
-};
-
-var offset = {
-    width: (view.right).getBoundingClientRect().width,
-    height: (view.right).getBoundingClientRect().height
-};
-var split = {
-    x: 0.5 * offset.width,
-    y: 0.5 * offset.height
-};
-var splitTarget = {
-    x: split.x,
-    y: split.y
-};
-var splitStep = {
-    x: 0,
-    y: 0
 };
 
 var infoText = {
@@ -40,7 +18,6 @@ var infoText = {
 };
 
 var urlFolder, urlFile;
-var timer;
 var textHeight = infoText.left.offsetHeight;
 var first = 1;
 var splitMode = 1;
@@ -49,7 +26,9 @@ var canvases = {
     left: prepCanvas(800, 800),
     right: prepCanvas(800, 800),
     leftScaled: prepCanvas(100, 100),
-    rightScaled: prepCanvas(100, 100)
+    rightScaled: prepCanvas(100, 100),
+    leftDest: getElId('canvasLeft'),
+    rightDest: getElId('canvasRight')
 }
 function prepCanvas(width, height, which) {
     var c;
@@ -65,13 +44,34 @@ function prepCanvas(width, height, which) {
     return c;
 }
 
+var resizer;
+
+var resizer_mode = {
+    js:   true,
+    wasm: true,
+    cib:  false,
+    ww:   true
+};
+
+function create_resizer() {
+    var opts = [];
+
+    Object.keys(resizer_mode).forEach(function (k) {
+        if (resizer_mode[k]) opts.push(k);
+    });
+
+    resizer = window.pica({ features: opts });
+}
+
+
 /* file|scale|codec|qual > setSide > setImage > processCanvasScale > setSize > setSplit */
 select.file.onchange = function () {
-    //select.scale.options[2].selected = true;
     setFile();
 };
 
 select.scale.onchange = processCanvasScale;
+
+select.subset.onchange = subsetChange;
 
 select.left.onchange = function () {
     setSide('left');
@@ -114,7 +114,7 @@ function getSlugName(str) {
     return str;
 }
 
-/* Uses Lanczos2 for rescaling. In-browser too blurry. Lanczos3 too slow. */
+
 function processCanvasScale(canvas, choseSide) {
     if (choseSide) {
         // Process only one side
@@ -128,11 +128,10 @@ function processCanvasScale(canvas, choseSide) {
     function scaleCanvas(inCanvas, side) {
         var scale = getSelValue(scaleSel, 'value');
         var outCnvs = canvases[side + 'Scaled'];
+        var destCnvs = canvases[side + 'Dest'];
 
         if (scale == 1) {
             viewOptions.scale = '';
-            prepCanvas(100, 100, outCnvs);
-            return setSize(inCanvas, side);
         }
 
         var width = Math.round(inCanvas.width * scale);
@@ -140,97 +139,40 @@ function processCanvasScale(canvas, choseSide) {
 
         viewOptions.scale = '*' + getSelValue(scaleSel, 'ratio');
         prepCanvas(width, height, outCnvs);
+        prepCanvas(width, height, destCnvs);
+        // set container height
+        var container = document.getElementsByClassName("img-comp-container")[0];
+        container.style.height = height + "px";
+        container.style.left = ((container.offsetWidth - width)/2) + "px";
 
-        window.pica.WW = true;
-        window.pica.resizeCanvas(inCanvas, outCnvs,
-            {
-                quality: 2, alpha: false, unsharpAmount: 0,
-                unsharpThreshold: 0, transferable: true
-            },
-            function () { setSize(outCnvs, side); }
-        )
-    }
-}
+        // Resize with pica
+        resizer.resize(inCanvas, outCnvs, {
+            quality: 3,
+            alpha: true,
+            unsharpAmount: 0,
+            unsharpRadius: 0,
+            unsharpThreshold: 0,
+            transferable: true
+        })
+            .then(function () {
+            // Copy buffer to visible element
+            destCnvs.getContext('2d').drawImage(outCnvs, 0, 0);
+            updateslider()
+            window.location.hash = (viewOptions.file).concat(viewOptions.scale,
+                                                             '&', viewOptions.left, '=', viewOptions.leftQ,
+                                                             '&', viewOptions.right, '=', viewOptions.rightQ,
+                                                             '&', viewOptions.subset)
+        })
+            .catch(function (err) {
+            console.log(err);
+            throw err;
+        });
 
-function setSize(inCanvas, side) {
-    var src, width, height, el;
-    src = inCanvas.toDataURL();
-    width = inCanvas.width;
-    height = inCanvas.height;
-    el = view[side];
-    if (first) {
-        view.left.style.height = height + "px";
-        view.right.style.height = height + "px";
-    } else el.style.height = height + "px";
-
-    el.style.width = width + "px";
-    var styleEl = getElId(side + "SideStyle");
-    if (styleEl == null) {
-        styleEl = document.createElement("style");
-        styleEl.id = side + "SideStyle";
-        styleEl.textContent = "#" + el.id + "{}";
-        document.head.appendChild(styleEl);
-    }
-    styleEl.sheet.cssRules[0].style.backgroundImage = 'url(\"' + src + '\")';
-    el.style.backgroundColor = "";
-    el.style.opacity = 1;
-    if (el == view.right) {
-        offset = {
-            width: width,
-            height: height
-        };
-        if (first) {
-            split.x = splitTarget.x = Math.round(width * .5);
-            split.y = splitTarget.y = Math.round(height * .5);
-            first = 0;
-        }
-    }
-    switchMode();
-    setSplit();
-    window.location.hash = (viewOptions.file).concat(viewOptions.scale,
-        '&', viewOptions.left, '=', viewOptions.leftQ,
-        '&', viewOptions.right, '=', viewOptions.rightQ,
-        '&', viewOptions.subset);
-}
-
-function setSplit() {
-    if (!timer) {
-        timer = setInterval(function () {
-            splitStep.x *= .5;
-            splitStep.y *= .5;
-            splitStep.x += (splitTarget.x - split.x) * .1;
-            splitStep.y += (splitTarget.y - split.y) * .1;
-
-            split.x += splitStep.x;
-            split.y += splitStep.y;
-
-            if (Math.abs(split.x - splitTarget.x) < .5)
-                split.x = splitTarget.x;
-            if (Math.abs(split.y - splitTarget.y) < .5)
-                split.y = splitTarget.y;
-
-            view.left.style.width = Math.round(split.x) + "px";
-            infoText.left.style.right = (offset.width - split.x) + "px";
-            infoText.left.style.bottom = (offset.height - split.y) + "px";
-            infoText.right.style.left = (split.x + 1) + "px";
-            infoText.right.style.bottom = (offset.height - split.y) + "px";
-
-            if (split.x == splitTarget.x && split.y == splitTarget.y) {
-                clearInterval(timer);
-                timer = null;
-            }
-        }, 20);
     }
 }
 
 function setImage(side, pathBase, codec, setText) {
     var canvas = canvases[side];
-
-    if (side == 'left' || first) {
-        view[side].style.backgroundColor = "#c6c6c6";
-        view[side].style.backgroundImage = "";
-    };
-    view[side].style.opacity = 0.5;
 
     var path = urlFolder.concat(pathBase, '/', urlFile, '.', codec);
     var xhr = new XMLHttpRequest();
@@ -241,7 +183,7 @@ function setImage(side, pathBase, codec, setText) {
     xhr.onload = function () {
 
         var blob = new Blob([xhr.response], {
-            type: "image/" + codec
+            type: "image/png"
         });
         var blobPath = window.URL.createObjectURL(blob);
 
@@ -259,9 +201,7 @@ function setImage(side, pathBase, codec, setText) {
         };
         image.onerror = function () {
             var arrayData = new Uint8Array(xhr.response);
-
             image.src = urlFolder.concat(pathBase, '/', urlFile, '.', 'png');
-
         };
         image.src = blobPath;
     };
@@ -273,14 +213,14 @@ function setSide(side) {
     var whichQual = (isRight) ? rightQual : leftQual;
     var image = getSelValue(select[side], 'value');
     var pathBase = getSelValue(select[side], 'folder');
-
+    var quality;
 
     if (pathBase != 'Original') {
         whichQual.disabled = false;
-        var quality = whichQual.options[whichQual.selectedIndex].innerHTML.toLowerCase() + '/';
+        quality = whichQual.options[whichQual.selectedIndex].innerHTML.toLowerCase() + '/';
     } else {
         whichQual.disabled = true;
-        var quality = '';
+        quality = '';
     }
 
     viewOptions[side] = pathBase;
@@ -288,10 +228,10 @@ function setSide(side) {
     pathBase = quality + pathBase;
 
     setImage(side.toLowerCase(), pathBase, image,
-        function (kbytes, bpp) {
-            infoText[side].innerHTML = (isRight) ? "&rarr;&nbsp;" + kbytes + "<br>&emsp;&nbsp;" + bpp : kbytes + "&nbsp;&larr;" + "<br>" + "\n" + bpp;
-            textHeight = (isRight) ? textHeight : infoText[side].offsetHeight;
-        });
+             function (kbytes, bpp) {
+        infoText[side].innerHTML = (isRight) ? "&rarr;&nbsp;" + kbytes + "<br>&emsp;&nbsp;" + bpp : kbytes + "&nbsp;&larr;<br>\n" + bpp;
+        textHeight = (isRight) ? textHeight : infoText[side].offsetHeight;
+    });
 }
 
 function setFile() {
@@ -306,37 +246,24 @@ function setFile() {
     setSide('left');
 }
 
-function moveSplit(event) {
-    if (splitMode && urlFile) {
-        var offset = view.right.getBoundingClientRect();
-        splitTarget.x = Math.round(event.clientX - offset.left);
-        splitTarget.y = Math.round(event.clientY - offset.top);
-        if (splitTarget.x < 0) splitTarget.x = 0;
-        if (splitTarget.y < textHeight) splitTarget.y = textHeight;
-        if (splitTarget.x >= offset.width) splitTarget.x = offset.width - 1;
-        if (splitTarget.y >= offset.height) splitTarget.y = offset.height - 1;
-        setSplit();
-    }
-    return false;
-}
 
 /* Shift key to enter 'flip-view'. Repeat to flip between images. Any other key to return to split-view. */
 function switchMode(keyCode) {
+    var img = document.getElementsByClassName("img-comp-overlay")[0];
     if (keyCode && keyCode == "16") {
         splitMode = 0;
-        var currLeft = (view.left.style.opacity > 0) ? 1 : 0; // current focus
+        var currLeft = (canvases.leftDest.style.opacity > 0) ? 1 : 0; // current focus
         var switchTo = (currLeft) ? 'right' : 'left'
 
         infoText.center.innerHTML = getSelValue(select[switchTo], 'folder') + ' '
             + infoText[switchTo].innerHTML.replace(/&nbsp;/g, '').replace(/←|→/g, '');
 
-        view.left.style.borderRight = "none";
-        view.left.style.opacity = 1 - currLeft;
-        view.left.style.width = (offset.width - 1) + "px";
+        img.style.borderRight = "none";
+        canvases.leftDest.style.opacity = 1 - currLeft;
+        img.style.width = canvases.rightDest.offsetWidth + "px";
     } else if (!splitMode) {
-        view.left.style.borderRight = "1px dotted white";
-        view.left.style.opacity = 1;
-        view.left.style.width = Math.round(split.x) + "px";
+        img.style.borderRight = "1px dotted white";
+        canvases.leftDest.style.opacity = 1;
         infoText.center.innerHTML = "--- vs ---";
         splitMode = 1;
     }
@@ -345,128 +272,197 @@ function switchMode(keyCode) {
     infoText.right.style.opacity = splitMode;
 }
 
+function subsetChange (event) {
 
-window.addEventListener("load",  function (event) {
     fetch("comparisonfiles.json")
         .then(response => response.json())
         .then(function (json) {
-            // subset
-            var subsetSel = document.getElementById("subsetSel");
 
-            var subsetChange = function (event) {
-                var hashArr, ampArr, imgOpts, name, scale, leftOpts, rightOpts, selectOpts;
+        var hashArr, ampArr, imgOpts, name, scale, leftOpts, rightOpts, selectOpts;
 
-                hashArr = (location.hash).split('#', 3);
-                ampArr = (hashArr.pop()+'&='+'&='+'&').split('&', 4);
+        hashArr = (location.hash).split('#', 3);
+        ampArr = (hashArr.pop()+'&=&=&').split('&', 4);
 
-                imgOpts = ampArr[0].split('*', 2);
-                leftOpts = ampArr[1].split('=', 2);
-                rightOpts = ampArr[2].split('=', 2);
-                selectOpts = ampArr[3].split('=', 2)
+        imgOpts = ampArr[0].split('*', 2);
+        leftOpts = ampArr[1].split('=', 2);
+        rightOpts = ampArr[2].split('=', 2);
+        selectOpts = ampArr[3].split('=', 2)
 
-                if (!event) {
-                    selectOpts = (selectOpts == "") ? subsetSel.value : selectOpts ;
-                } else {
-                    selectOpts = event.target.value;
-                }
+        if (!event) {
+            selectOpts = (selectOpts == "") ? select.subset.value : selectOpts ;
+        } else {
+            selectOpts = event.target.value;
+        }
 
-                // format
-                var leftSel = document.getElementById("leftSel");
-                var rightSel = document.getElementById("rightSel");
-                while (leftSel.firstChild) {
-                    leftSel.removeChild(leftSel.firstChild);
-                }
-                while (rightSel.firstChild) {
-                    rightSel.removeChild(rightSel.firstChild);
-                }
-                for (format of json["comparisonfiles"][selectOpts]["format"]) {
-                    var optLeft = document.createElement("option");
-                    var optRight = document.createElement("option");
+        // format
+        while (select.left.firstChild) {
+            select.left.removeChild(leftSel.firstChild);
+        }
+        while (select.right.firstChild) {
+            select.right.removeChild(rightSel.firstChild);
+        }
+        for (var format of json.comparisonfiles[selectOpts].format) {
+            var optLeft = document.createElement("option");
+            var optRight = document.createElement("option");
 
-                    optLeft.setAttribute("folder", format["name"]);
-                    optLeft.text = format["name"];
-                    optLeft.value = format["extension"];
-                    leftSel.add(optLeft, null);
+            optLeft.setAttribute("folder", format.name);
+            optLeft.text = format.name;
+            optLeft.value = format.extension;
+            select.left.add(optLeft, null);
 
-                    optRight.setAttribute("folder", format["name"]);
-                    optRight.text = format["name"];
-                    optRight.value = format["extension"];
-                    rightSel.add(optRight, null);
-                }
-                // files
-                var fileSel = document.getElementById("fileSel");
-                while (fileSel.firstChild) {
-                    fileSel.removeChild(fileSel.firstChild);
-                }
-                var filesList = json["comparisonfiles"][selectOpts]["files"]
-                filesList.sort(function(a,b) {
-                    if ( a.title < b.title )
-                        return -1;
-                    if ( a.title > b.title )
-                        return 1;
-                    return 0;
-                })
-                for (file of filesList) {
-                    var opt = document.createElement("option");
-                    opt.value = file["filename"];
-                    opt.text = file["title"];
-                    fileSel.add(opt, null);
-                }
-                urlFolder = "comparisonfiles/" + getSelValue(select.subset, 'value') + "/";
-
-                viewOptions.subset = selectOpts;
-                select.subset.value = selectOpts;
-
-                for (var opt, j = 0; opt = select.file.options[j]; j++) {
-                    if (getSlugName(opt.text) == imgOpts[0]) {
-                        select.file.selectedIndex = j;
-                        var z, s, q;
-
-                        if (imgOpts[1]) {
-                            var z = document.querySelector('#scaleSel [ratio="' + imgOpts[1] + '"]');
-                            if (z) {z.selected = true};
-                        }
-
-
-                        if (leftOpts) {
-                            s = document.querySelector('#leftSel [folder="' + leftOpts[0] + '"]');
-                            if (s) {s.selected = true};
-                            q = document.querySelector('#leftQual [value="' + leftOpts[1] + '"]');
-                            if (q) {q.selected = true};
-                        }
-                        if (rightOpts) {
-                            s = document.querySelector('#rightSel [folder="' + rightOpts[0] + '"]');
-                            if (s) {s.selected = true};
-                            q = document.querySelector('#rightQual [value="' + rightOpts[1] + '"]');
-                            if (q) {q.selected = true};
-                        }
-                        break;
-                    }
-                };
-
-                setFile();
+            optRight.setAttribute("folder", format.name);
+            optRight.text = format.name;
+            optRight.value = format.extension;
+            select.right.add(optRight, null);
+        }
+        // files
+        while (select.file.firstChild) {
+            select.file.removeChild(fileSel.firstChild);
+        }
+        var filesList = json.comparisonfiles[selectOpts].files;
+        filesList.sort(function(a,b) {
+            if ( a.title < b.title ) {
+                return -1;
             }
-
-            subsetSel.onchange = subsetChange;
-
-            for (subset in json['comparisonfiles']) {
-                var opt = document.createElement("option");
-                opt.value = subset;
-                opt.text = subset;
-                subsetSel.add(opt, null);
-
+            if ( a.title > b.title ) {
+                return 1;
             }
-            subsetChange();
-            urlFolder = "comparisonfiles/" + getSelValue(select.subset, 'value') + "/";
-            setFile();
-        });
+            return 0;
+        })
+        for (var file of filesList) {
+            let opt = document.createElement("option");
+            opt.value = file.filename;
+            opt.text = file.title;
+            select.file.add(opt, null);
+        }
+        urlFolder = "comparisonfiles/" + getSelValue(select.subset, 'value') + "/";
+
+        viewOptions.subset = selectOpts;
+        select.subset.value = selectOpts;
+
+        for (var opt, j = 0; opt = select.file.options[j]; j++) {
+            if (getSlugName(opt.text) == imgOpts[0]) {
+                select.file.selectedIndex = j;
+                var z, s, q;
+
+                if (imgOpts[1]) {
+                    z = document.querySelector('#scaleSel [ratio="' + imgOpts[1] + '"]');
+                    if (z) {z.selected = true};
+                }
+
+                if (leftOpts) {
+                    s = document.querySelector('#leftSel [folder="' + leftOpts[0] + '"]');
+                    if (s) {s.selected = true};
+                    q = document.querySelector('#leftQual [value="' + leftOpts[1] + '"]');
+                    if (q) {q.selected = true};
+                }
+                if (rightOpts) {
+                    s = document.querySelector('#rightSel [folder="' + rightOpts[0] + '"]');
+                    if (s) {s.selected = true};
+                    q = document.querySelector('#rightQual [value="' + rightOpts[1] + '"]');
+                    if (q) {q.selected = true};
+                }
+                break;
+            }
+        };
+
+        setFile();
+    });
+}
+
+
+function updateslider() {
+    var slider, img, clicked = 0, w, h;
+
+    img = document.getElementsByClassName("img-comp-overlay")[0];
+    /*get the width and height of the img element*/
+    w = canvases.rightDest.offsetWidth;
+    h = canvases.rightDest.offsetHeight;
+    /*set the width of the img element to 50%:*/
+    img.style.width = (w / 2) + "px";
+    img.style.borderRight = "1px dotted white";
+
+
+    /*execute a function when the mouse button is pressed:*/
+
+    window.addEventListener("mousemove", slideMove);
+    function slideReady(e) {
+        /*prevent any other actions that may occur when moving over the image:*/
+        e.preventDefault();
+        /*the slider is now clicked and ready to move:*/
+        clicked = 1;
+        /*execute a function when the slider is moved:*/
+    }
+    function slideMove(e) {
+        if (splitMode) {
+            var posx, posy;
+            /*get the cursor's x position:*/
+            [posx, posy] = getCursorPos(e);
+            /*prevent the slider from being positioned outside the image:*/
+            if (posx < 0) posx = 0;
+            if (posx > w) posx = w;
+            if (posy < 0) posy = 0;
+            if (posy > h) posy = h;
+            /*execute a function that will resize the overlay image according to the cursor:*/
+            slide(posx, posy);
+        }
+    }
+    function getCursorPos(e) {
+        var a, x, y = 0;
+        e = e || window.event;
+        /*get the x positions of the image:*/
+        a = img.getBoundingClientRect();
+        /*calculate the cursor's x coordinate, relative to the image:*/
+        x = e.pageX - a.left;
+        /*consider any page scrolling:*/
+        x = x - window.pageXOffset;
+        /*calculate the cursor's y coordinate, relative to the image:*/
+        y = e.pageY - a.top;
+        /*consider any page scrolling:*/
+        y = y - window.pageYOffset;
+        return [x, y];
+    }
+    function slide(x, y) {
+        var bound;
+        /*resize the image:*/
+        img.style.width = x + "px";
+        /*position the slider:*/
+        infoText.left.style.left = (img.offsetWidth - infoText.left.offsetWidth) + "px";
+        infoText.right.style.left = (img.offsetWidth) + "px";
+        if (y + infoText.left.offsetHeight > h) {
+            bound = y - infoText.left.offsetHeight;
+        } else {
+            bound = y;
+        }
+        infoText.left.style.top = bound + "px";
+        infoText.right.style.top = bound + "px";
+    }
+}
+
+
+
+window.addEventListener("load", function (event) {
+    fetch("comparisonfiles.json")
+        .then(response => response.json())
+        .then(function (json) {
+        // subset
+        for (var subset in json.comparisonfiles) {
+            var opt = document.createElement("option");
+            opt.value = subset;
+            opt.text = subset;
+            select.subset.add(opt, null);
+        }
+        subsetChange();
+        create_resizer();
+        urlFolder = "comparisonfiles/" + getSelValue(select.subset, 'value') + "/";
+        setFile();
+    });
 });
+
 window.addEventListener("keydown", function (event) {
     switchMode(event.keyCode);
 }, false);
 
-view.right.addEventListener("mousemove", moveSplit, false);
-view.right.addEventListener("click", moveSplit, false);
 
 infoText.right.style.backgroundColor = "rgba(0,0,0,.3)";
 infoText.left.style.backgroundColor = "rgba(0,0,0,.3)";

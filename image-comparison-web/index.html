@@ -56,11 +56,16 @@
             </tr>
             <tr>
                 <td colspan=3 style="padding-top: 1em; padding-bottom: 1em;">
-                    <div id="rightContainer" style="margin-left: auto; margin-right: auto; position: relative; width:800px; height:800px;">
-                        <div id="leftContainer" style="border-right: 1px dotted white; width:800px; height:800px;"></div>
-                        <div id="leftText" style="position: absolute; color: white; padding:.2em .5em .2em .5em;"></div>
-                        <div id="rightText" style="position: absolute; color: white; padding:.2em .5em .2em .5em;"></div>
-                    </div>
+                  <div class="img-comp-container">
+                      <div class="img-comp-img">
+                          <canvas id="canvasRight"></canvas>
+                      </div>
+                      <div class="img-comp-img img-comp-overlay">
+                          <canvas id="canvasLeft"></canvas>
+                      </div>
+                      <div id="leftText" style="position: absolute; color: white; padding:.2em .5em .2em .5em;"></div>
+                      <div id="rightText" style="position: absolute; color: white; padding:.2em .5em .2em .5em;"></div>
+                </div>
                 </td>
             </tr>
             <tr>
