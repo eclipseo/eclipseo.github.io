@@ -306,12 +306,12 @@ function subsetChange (event) {
             var optLeft = document.createElement("option");
             var optRight = document.createElement("option");
 
-            optLeft.setAttribute("folder", format.name);
+            optLeft.setAttribute("folder", format.folder);
             optLeft.text = format.name;
             optLeft.value = format.extension;
             select.left.add(optLeft, null);
 
-            optRight.setAttribute("folder", format.name);
+            optRight.setAttribute("folder", format.folder);
             optRight.text = format.name;
             optRight.value = format.extension;
             select.right.add(optRight, null);
