@@ -15,17 +15,17 @@
                 {
                     "extension": "heif",
                     "folder": "HEIF_1.12.0",
-                    "name": "HEIF 1.12.0"
+                    "name": "HEIF (v1.12.0)"
                 },
                 {
                     "extension": "jxl",
                     "folder": "JXL_0.3.7",
-                    "name": "JPEG XL v0.3.7"
+                    "name": "JPEG XL (v0.3.7)"
                 },
                 {
                     "extension": "jxl",
                     "folder": "JXL_20210715",
-                    "name": "JPEG XL JXL_20210715"
+                    "name": "JPEG XL (20210715)"
                 },
                 {
                     "extension": "jpg",
@@ -35,17 +35,17 @@
                 {
                     "extension": "webp",
                     "folder": "WEBP_1.2.0",
-                    "name": "Webp v1.2.0"
+                    "name": "Webp (v1.2.0)"
                 },
                 {
                     "extension": "wp2",
                     "folder": "WEBP2_20201204",
-                    "name": "Webp2 20201204"
+                    "name": "Webp2 (20201204)"
                 },
                 {
                     "extension": "wp2",
                     "folder": "WEBP2_20210715",
-                    "name": "Webp2 20210715"
+                    "name": "Webp2 (20210715)"
                 },
                 {
                     "extension": "png",
