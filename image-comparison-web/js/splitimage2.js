@@ -18,6 +18,7 @@ var infoText = {
 };
 
 var urlFolder, urlFile;
+var urlStorage = "https://images-comparison.fra1.digitaloceanspaces.com";
 var textHeight = infoText.left.offsetHeight;
 var first = 1;
 var splitMode = 1;
@@ -336,7 +337,7 @@ function subsetChange (event) {
             opt.text = file.title;
             select.file.add(opt, null);
         }
-        urlFolder = "comparisonfiles/" + getSelValue(select.subset, 'value') + "/";
+        urlFolder = urlStorage + "/comparisonfiles/" + getSelValue(select.subset, 'value') + "/";
 
         viewOptions.subset = selectOpts;
         select.subset.value = selectOpts;
@@ -455,7 +456,7 @@ window.addEventListener("load", function (event) {
         }
         subsetChange();
         create_resizer();
-        urlFolder = "comparisonfiles/" + getSelValue(select.subset, 'value') + "/";
+        urlFolder = urlStorage + "/comparisonfiles/" + getSelValue(select.subset, 'value') + "/";
         setFile();
     });
 });
