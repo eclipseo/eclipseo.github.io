@@ -382,9 +382,10 @@ function updateslider() {
     w = canvases.rightDest.offsetWidth;
     h = canvases.rightDest.offsetHeight;
     /*set the width of the img element to 50%:*/
-    img.style.width = (w / 2) + "px";
-    img.style.borderRight = "1px dotted white";
-
+    if (splitMode = 1) {
+        img.style.width = (w / 2) + "px";
+        img.style.borderRight = "1px dotted white";
+    }
 
     /*execute a function when the mouse button is pressed:*/
 
@@ -466,6 +467,7 @@ window.addEventListener("keydown", function (event) {
     switchMode(event.keyCode);
 }, false);
 
+window.onresize = setFile;
 
 infoText.right.style.backgroundColor = "rgba(0,0,0,.3)";
 infoText.left.style.backgroundColor = "rgba(0,0,0,.3)";
