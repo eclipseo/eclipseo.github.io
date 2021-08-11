@@ -192,6 +192,7 @@ function setImage(side, pathBase, codec, setText) {
         var canvas = canvases[side];
         canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
         var image = new Image();
+        image.crossOrigin = "Anonymous";
         image.onload = function () {
             canvas.width = image.width;
             canvas.height = image.height;
