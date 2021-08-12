@@ -6,3 +6,4 @@ static_sites:
     deploy_on_push: true
     repo: eclipseo/eclipseo.github.io
   name: images-comparison
+  index_document: image-comparison-web/index.html
