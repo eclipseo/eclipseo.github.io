@@ -1,9 +1,9 @@
 spec:
-  name: images-comparison
+  name: eclipseo.github.io
   static_sites:
   - environment_slug: html
     git:
       branch: master
       repo_clone_url: https://github.com/eclipseo/eclipseo.github.io.git
-    name: images-comparison
+    name: eclipseo.github.io
     index_document: image-comparison-web/index.html
