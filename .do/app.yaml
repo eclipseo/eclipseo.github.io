@@ -1,9 +1,9 @@
-name: images-comparison
+name: sample-html
 static_sites:
 - environment_slug: html
   github:
     branch: master
     deploy_on_push: true
     repo: eclipseo/eclipseo.github.io
-  name: images-comparison
+  name: sample-html
   index_document: image-comparison-web/index.html
