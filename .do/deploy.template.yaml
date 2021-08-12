@@ -6,4 +6,4 @@ spec:
       branch: master
       repo_clone_url: https://github.com/eclipseo/eclipseo.github.io.git
     name: eclipseo.github.io
-    index_document: image-comparison-web/index.html
+    index_document: index.html
