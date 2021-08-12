@@ -2,7 +2,7 @@ name: images-comparison
 static_sites:
 - environment_slug: html
   github:
-    branch: main
+    branch: master
     deploy_on_push: true
     repo: eclipseo/eclipseo.github.io
   name: images-comparison

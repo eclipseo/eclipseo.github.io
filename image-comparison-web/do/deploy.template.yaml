@@ -3,6 +3,6 @@ spec:
   static_sites:
   - environment_slug: html
     git:
-      branch: main
+      branch: master
       repo_clone_url: https://github.com/eclipseo/eclipseo.github.io.git
     name: images-comparison
