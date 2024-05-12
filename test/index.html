@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Full Viewport Image</title>
+<style>
+  body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;  /* Centers image vertically */
+    justify-content: center; /* Centers image horizontally */
+    overflow: hidden; /* Hide scrollbars */
+  }
+
+  img {
+    max-width: 100%;  /* Limit width to viewport */
+    max-height: 100%; /* Limit height to viewport */
+    object-fit: contain; /* Ensures the image is contained within the frame without cropping */
+  }
+</style>
+</head>
+<body>
+<img src="IMG01623-HDR.jxl" alt="Full Screen Image">
+</body>
+</html>
